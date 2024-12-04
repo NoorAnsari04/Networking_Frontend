@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "977598092798",
+    "project_id": "conference-prod8f3bf",
+    "storage_bucket": "conference-prod-8f3bf.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:977598092798:android:660e116f29e0f7e2b75caf",
+        "android_client_info": {
+          "package_name": "com.codewithandrea.my_test_app_flavors"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAjUwi5-UeQF_bbQwVsI8Nyi0coS4Qxcvg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
