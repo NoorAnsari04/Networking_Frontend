@@ -16,13 +16,13 @@ class ProfileProvider with ChangeNotifier {
       _profileNetworking.uploadImage(image);
 
   Future<bool> updateProfile(
-      BuildContext context, Map<String, dynamic> userDetails) async {
+      BuildContext context, Map<String, dynamic> userDetails, String? profileImgPath) async {
     AuthenticationProvider _authProvider =
         Provider.of<AuthenticationProvider>(context, listen: false);
     _isLoading = true;
     notifyListeners();
     final res = await _profileNetworking.updateProfile(
-        _authProvider.appUser!.id, userDetails);
+        _authProvider.appUser!.id, userDetails, profileImgPath ?? '');
 
     if (res) {
       final user = AppUser.fromJson(userDetails);

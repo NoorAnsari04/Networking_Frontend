@@ -16,7 +16,7 @@ class UserInfoSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = authProvider.appUser;
-    final isStudent = user?.isStudent ?? false;
+    final isStudent = user?.userType == 'Student';
 
     return Column(
       children: [

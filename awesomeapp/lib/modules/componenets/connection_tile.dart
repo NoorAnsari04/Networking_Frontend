@@ -13,7 +13,7 @@ class ConnectionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isStudent = user.isStudent ?? false;
+    final bool isStudent = user.userType == 'Student';
 
     return GestureDetector(
       onTap: () {

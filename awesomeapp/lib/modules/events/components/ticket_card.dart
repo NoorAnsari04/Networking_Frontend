@@ -59,8 +59,8 @@ class TicketCard extends StatelessWidget {
           child: Column(
             children: [
               20.height,
-              Text('${appUser.name}', style: kRaleway),
-              Text(appUser.position ?? '',
+              Text('${appUser.name} ${appUser.lastName}', style: kRaleway),
+              Text('${appUser.position}' ,
                   style: kRaleway.copyWith(fontSize: 16.sp)),
             ],
           ),

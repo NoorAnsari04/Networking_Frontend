@@ -4,9 +4,11 @@ import 'event_model.dart';
 
 class EventProvider with ChangeNotifier {
   List<EventModel> _events = [];
+  EventModel? _selectedEvent;
   bool _isLoading = false;
 
   List<EventModel> get events => _events;
+  EventModel? get selectedEvent => _selectedEvent;
 
   bool get isLoading => _isLoading;
 
@@ -26,5 +28,28 @@ class EventProvider with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  Future<EventModel?> fetchEventById(eventId) async {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      final res = await EventNetworking.fetchEventById(eventId);
+      // _selectedEvent = res;
+      return res;
+    } catch (e) {
+      print("Error fetching event by ID: $e");
+
+    } finally{
+      _isLoading = false;
+      notifyListeners();
+    }
+// notifyListeners();
+    return null;
+  }
+
+  void clearSelectedEvent(){
+    _selectedEvent = null;
+    notifyListeners();
   }
 }

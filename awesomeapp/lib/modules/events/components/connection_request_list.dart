@@ -30,7 +30,7 @@ class ConnectionRequestList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isStudent = user.isStudent ?? false;
+    final bool isStudent = user.userType == 'Student';
 
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),

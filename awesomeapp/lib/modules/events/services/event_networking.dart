@@ -1,14 +1,82 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:my_test_app_flavors/core/serviceLocator.dart';
+import 'package:my_test_app_flavors/modules/auth/services/auth_provider.dart';
+import '../../../core/constants/dio_client.dart';
 import 'event_model.dart';
+import '../../../core/constants/api_constants.dart';
+import 'package:dio/dio.dart' as dio;
 
 class EventNetworking {
   static Future<List<EventModel>> fetchEvents() async {
-    final querySnapshot =
-        await FirebaseFirestore.instance.collection('conferences').get();
-    List<EventModel> events = querySnapshot.docs
-        .map((doc) => EventModel.fromJson(doc.data()))
-        .toList();
+    final url = ApiConstants.baseUrl + ApiConstants.allEvents;
 
-    return events;
+    try {
+      String? token = serviceLocator<AuthenticationProvider>().authToken();
+      print("Access Token: $token");
+      final dioInstance = DioClient.getDioInstance();
+      final response = await dioInstance.get(url,
+          options: dio.Options(
+            headers: {
+              "Authorization": "Bearer $token",
+            },
+          ));
+      print('Error: ${response.statusCode}, ${response.data}');
+      if (response.statusCode == 200) {
+        // Check if the response data is a list
+        if (response.data["allConferences"] is List) {
+          final List<dynamic> data = response.data["allConferences"];
+          return data.map((e) => EventModel.fromJson(e)).toList();
+        } else {
+          throw Exception('Failed to load events');
+        }
+      } else {
+        throw Exception('Failed to load events');
+      }
+    } catch (e) {
+      print('Error fetching events: $e');
+      throw e;
+    }
+  }
+
+  static Future<EventModel> fetchEventById(eventId) async {
+    final url = ApiConstants.baseUrl + "/api/conference/$eventId";
+    try {
+      String? token = serviceLocator<AuthenticationProvider>().authToken();
+      final dioInstance = DioClient.getDioInstance();
+      print(token);
+
+      final response = await dioInstance.get(url,
+          options: dio.Options(headers: {
+            "Authorization": "Bearer $token",
+          }));
+      print(response.data); // Log the raw response
+
+      if (response.statusCode == 200 && response.data != null) {
+        final eventData = response.data['conference'];
+        if (eventData == null) {
+          throw Exception('Event data is null');
+        }
+        return EventModel.fromJson(eventData);
+      } else {
+        throw Exception("Failed to fetch event by Id");
+      }
+    } catch (e) {
+      print("Error fetching event by ID: $e");
+      throw Exception('Failed to fetch event: $e');
+    }
   }
 }
+// import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'event_model.dart';
+
+// class EventNetworking {
+//   static Future<List<EventModel>> fetchEvents() async {
+//     final querySnapshot =
+//         await FirebaseFirestore.instance.collection('conferences').get();
+//     List<EventModel> events = querySnapshot.docs
+//         .map((doc) => EventModel.fromJson(doc.data()))
+//         .toList();
+
+//     return events;
+//   }
+// }

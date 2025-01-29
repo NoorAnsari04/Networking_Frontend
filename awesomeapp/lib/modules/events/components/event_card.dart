@@ -1,3 +1,6 @@
+import 'package:my_test_app_flavors/modules/events/services/event_networking.dart';
+import 'package:provider/provider.dart';
+
 import '../../auth/services/app_user.dart';
 import '../services/event_model.dart';
 import 'package:flutter/material.dart';
@@ -19,14 +22,29 @@ class EventCard extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 7.h),
       child: GestureDetector(
-        onTap: () {
-          context.pushNamed(
-            EventDetailScreen.id,
-            extra: {
-              'event': event,
-              'appUser': appUser,
-            },
-          );
+        onTap: () async {
+          showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (context) => Center(
+                    child: CircularProgressIndicator(),
+                  ));
+          try {
+            final eventDetails =
+                await EventNetworking.fetchEventById(event.eventId);
+            Navigator.pop(context);
+            context.pushNamed(
+              EventDetailScreen.id,
+              extra: {
+                'event': eventDetails,
+                'appUser': appUser,
+              },
+            );
+          } catch (e) {
+            Navigator.pop(context);
+            ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Failed to load event details')));
+          }
         },
         child: SingleChildScrollView(
           child: Column(

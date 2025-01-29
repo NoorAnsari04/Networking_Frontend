@@ -15,17 +15,20 @@ class IndustryPersonForm extends StatelessWidget {
         Text('Company'),
         CustomUserDetailsField(
           controller: formData.companyController,
+          onChanged: (_){}
         ),
         SizedBox(height: 10),
         Text('Years of Experience'),
         CustomUserDetailsField(
           controller: formData.experienceController,
           keyboardType: TextInputType.number,
+          onChanged: (_){}
         ),
         SizedBox(height: 10),
         Text('Designation'),
         CustomUserDetailsField(
           controller: formData.positionController,
+          onChanged: (_){}
         ),
       ],
     );

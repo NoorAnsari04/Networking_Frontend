@@ -26,7 +26,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _lastNameController = TextEditingController();
-  final _genderController = TextEditingController();
+  // final _phNumberController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
@@ -35,7 +35,7 @@ class _SignupScreenState extends State<SignupScreen> {
   void dispose() {
     _nameController.dispose();
     _lastNameController.dispose();
-    _genderController.dispose();
+    // _phNumberController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
@@ -46,7 +46,7 @@ class _SignupScreenState extends State<SignupScreen> {
     if (_formKey.currentState!.validate()) {
       final success =
           await Provider.of<AuthenticationProvider>(context, listen: false)
-              .signUp(_emailController.text, _passwordController.text);
+              .signUp( context,email:_emailController.text, password: _passwordController.text, firstName: _nameController.text, lastName: _lastNameController.text, confirmPassword:_confirmPasswordController.text);
 
       if (success) {
         Navigator.push(
@@ -57,6 +57,10 @@ class _SignupScreenState extends State<SignupScreen> {
                 'email': _emailController.text,
                 'name': _nameController.text,
                 'lastName': _lastNameController.text,
+                // 'phNumber': _phNumberController.text,
+                'password': _passwordController.text,
+                'confirmPassword': _confirmPasswordController.text
+                
               },
             ),
           ),
@@ -148,6 +152,8 @@ class _SignupScreenState extends State<SignupScreen> {
                         emailController: _emailController,
                         passwordController: _passwordController,
                         confirmPasswordController: _confirmPasswordController,
+                        
+
                         onSignup: _handleSignUp,
                       ),
                       TextButton(

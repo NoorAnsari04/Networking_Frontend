@@ -27,7 +27,7 @@ class UserDetailsScreen extends StatefulWidget {
 }
 
 class _UserDetailsScreenState extends State<UserDetailsScreen> {
-  bool isStudent = true;
+  String userType = 'Student';
   final _formKey = GlobalKey<FormState>();
   final formData = FormData();
 
@@ -70,16 +70,16 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
     return ListView(
       children: [
         UserTypeSelection(
-          isStudent: isStudent,
+          userType: userType,
           onChanged: (value) {
             setState(() {
-              isStudent = value!;
+              userType = value!;
             });
           },
           title: 'Who are you?',
         ),
         SizedBox(height: 10),
-        if (isStudent)
+        if (userType == 'Student')
           StudentDetailsForm(formData: formData)
         else
           IndustryPersonForm(formData: formData),

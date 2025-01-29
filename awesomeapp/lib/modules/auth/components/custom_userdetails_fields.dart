@@ -7,7 +7,7 @@ class CustomUserDetailsField extends StatelessWidget {
   final String? hintText;
   final TextInputType? keyboardType;
   final bool obscureText;
-
+  final Function(dynamic value) onChanged;
   const CustomUserDetailsField({
     Key? key,
     required this.controller,
@@ -15,6 +15,7 @@ class CustomUserDetailsField extends StatelessWidget {
     this.hintText,
     this.keyboardType,
     this.obscureText = false,
+    required this.onChanged,
   }) : super(key: key);
 
   @override
@@ -31,6 +32,7 @@ class CustomUserDetailsField extends StatelessWidget {
         ),
         contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 12.0),
       ),
+      onChanged: onChanged,
     );
   }
 }

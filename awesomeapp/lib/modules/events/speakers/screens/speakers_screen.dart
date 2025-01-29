@@ -23,18 +23,18 @@ class _SpeakersScreenState extends State<SpeakersScreen> {
   List<AppUser> _filteredSpeakers = [];
   bool _isCurrentUserSpeaker = false;
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final speakerProvider =
-          Provider.of<SpeakerProvider>(context, listen: false);
-      await speakerProvider.fetchSpeakers();
-      _isCurrentUserSpeaker = await speakerProvider.isCurrentUserSpeaker();
-    });
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   WidgetsBinding.instance.addPostFrameCallback((_) async {
+  //     final speakerProvider =
+  //         Provider.of<SpeakerProvider>(context, listen: false);
+  //     await speakerProvider.fetchSpeakers(event);
+  //     _isCurrentUserSpeaker = await speakerProvider.isCurrentUserSpeaker();
+  //   });
 
-    _searchController.addListener(_filterSpeakers);
-  }
+  //   _searchController.addListener(_filterSpeakers);
+  // }
 
   @override
   void dispose() {

@@ -6,6 +6,7 @@ import 'package:my_test_app_flavors/core/constants/color_constants.dart';
 import 'package:my_test_app_flavors/core/extensions/extension.dart';
 import 'package:my_test_app_flavors/core/extensions/scaffold_message.dart';
 import 'package:my_test_app_flavors/core/shared/user_avatar.dart';
+import 'package:my_test_app_flavors/modules/auth/services/app_user.dart';
 import 'package:my_test_app_flavors/modules/auth/services/auth_provider.dart';
 import 'package:provider/provider.dart';
 import '../../../../../core/shared/user_profile_manager.dart';
@@ -54,9 +55,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void _initializeControllers() {
     _profileProvider = Provider.of<ProfileProvider>(context, listen: false);
     _authProvider = Provider.of<AuthenticationProvider>(context, listen: false);
-    _isStudent = _authProvider.appUser?.isStudent ?? false;
+    _isStudent = _authProvider.appUser?.userType == 'Student';
 
-    _nameController = TextEditingController(text: _authProvider.appUser!.name);
+    _nameController = TextEditingController(text: _authProvider.appUser!.fullName);
     _emailController =
         TextEditingController(text: _authProvider.appUser!.email);
     _descriptionController =
@@ -77,7 +78,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       _positionController =
           TextEditingController(text: _authProvider.appUser!.position);
       _experienceController =
-          TextEditingController(text: _authProvider.appUser!.experience ?? '');
+          TextEditingController(text: _authProvider.appUser!.yearOfExperience ?? '');
     }
 
     _imageUrl = _authProvider.appUser!.imageUrl;
@@ -112,7 +113,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         'name': _nameController.text,
         'email': _emailController.text,
         'description': _descriptionController.text,
-        'linkedinUrl': _linkedinController.text,
+        'linkedInUrl': _linkedinController.text,
         'imageUrl': imageUrl,
         'isStudent': _isStudent,
       };
@@ -131,13 +132,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         });
       }
 
-      final success = await _profileProvider.updateProfile(context, userData);
+      final success = await _profileProvider.updateProfile(context, userData, imageUrl);
 
       if (success) {
         setState(() {
           _imageUrl = imageUrl;
         });
         context.showSnackBar('Profile updated Successfully');
+        _authProvider.updateUser(userData as AppUser);
         Navigator.pop(context, true);
       }
     }

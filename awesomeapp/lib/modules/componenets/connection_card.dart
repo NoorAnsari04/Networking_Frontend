@@ -13,7 +13,7 @@ class ConnectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isStudent = user.isStudent ?? false;
+    final bool isStudent = user.userType == 'Student';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 class UserTypeSelection extends StatelessWidget {
-  final bool isStudent;
-  final ValueChanged<bool?> onChanged;
+  final String userType;
+  final ValueChanged<String?> onChanged;
   final String title;
 
   UserTypeSelection({
-    required this.isStudent,
+    required this.userType,
     required this.onChanged,
     required this.title,
   });
@@ -19,14 +19,14 @@ class UserTypeSelection extends StatelessWidget {
         Text(title),
         RadioListTile(
           title: Text('Student'),
-          value: true,
-          groupValue: isStudent,
+          value: 'Student',
+          groupValue: userType,
           onChanged: onChanged,
         ),
         RadioListTile(
           title: Text('Industry Person'),
-          value: false,
-          groupValue: isStudent,
+          value: 'Industry Person',
+          groupValue: userType,
           onChanged: onChanged,
         ),
       ],

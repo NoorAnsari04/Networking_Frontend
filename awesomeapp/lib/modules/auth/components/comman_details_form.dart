@@ -17,11 +17,13 @@ class CommonDetailsForm extends StatelessWidget {
         CustomUserDetailsField(
           controller: formData.linkedinUrlController,
           keyboardType: TextInputType.url,
+          onChanged: (_){},
         ),
         SizedBox(height: 10),
         Text('Description'),
         CustomUserDetailsField(
           controller: formData.descriptionController,
+          onChanged: (_){}
         ),
         SizedBox(height: 10),
         Card(
@@ -42,15 +44,19 @@ class CommonDetailsForm extends StatelessWidget {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
-        return Container(
-          height: MediaQuery.of(context).size.height * 0.5,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-          ),
-          child: InterestSelection(
-            initialInterests: formData.interests,
-          ),
+        return Builder(
+          builder: (context) {
+            return Container(
+              height: MediaQuery.of(context).size.height*0.68,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              child: InterestSelection(
+                initialInterests: formData.interests,
+              ),
+            );
+          }
         );
       },
     );

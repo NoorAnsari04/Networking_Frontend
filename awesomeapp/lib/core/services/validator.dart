@@ -15,8 +15,9 @@ class Validator {
     if (password == null || password.isEmpty) {
       return 'Password can\'t be empty';
     }
-
-    if (password.length < 8) {
+    //TODO change this length to 8 again
+    
+    if (password.length < 1) {
       return !regex.hasMatch(password)
           ? "Password must be 8 bit long having a special character and an uppercase character also an integer"
           : null;

@@ -1,8 +1,11 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-// import 'package:carousel_slider/carousel_slider.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:get/get.dart';
 import 'package:my_test_app_flavors/core/constants/color_constants.dart';
+import 'package:my_test_app_flavors/modules/events/screens/event_detail_screen.dart';
 import 'package:my_test_app_flavors/modules/events/services/event_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -24,6 +27,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int currentIndex = 0;
+  bool isLoading = true;
+  List<EventModel> Events = [];
 
   @override
   void initState() {
@@ -42,6 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
           return Center(child: Text('No events found'));
         } else {
           List<EventModel> events = eventProvider.events;
+          log(events.length.toString());
 
           return Consumer<AuthenticationProvider>(
             builder: (context, authProv, _) {
@@ -64,23 +70,48 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                   ),
-                  // CarouselSlider(
-                  //   options: CarouselOptions(
-                  //     onPageChanged: (index, reason) {
-                  //       setState(() {
-                  //         currentIndex = index;
-                  //       });
-                  //     },
-                  //     aspectRatio: 1.8,
-                  //     viewportFraction: 1,
-                  //     enlargeCenterPage: true,
-                  //   ),
-                  //   items: events.map((event) {
-                  //     return EventCard(
-                  //         event: event, showDate: false, appUser: appUser);
-                  //   }).toList(),
-                  // ),
-                  SizedBox(height: Get.height * 0.02),
+                  CarouselSlider(
+                    options: CarouselOptions(
+                      onPageChanged: (index, reason) {
+                        setState(() {
+                          currentIndex = index;
+                        });
+                      },
+                      aspectRatio: 1.8,
+                      viewportFraction: 1,
+                      enlargeCenterPage: true,
+                    ),
+                    items: events.map((event) {
+                      return GestureDetector(
+                        onTap: () async {
+                          try {
+                            final eventProvider = Provider.of<EventProvider>(
+                                context,
+                                listen: false);
+                            final fetchedEvent = await eventProvider
+                                .fetchEventById(event.eventId);
+
+                            if (fetchedEvent != null) {
+                              Get.to(() => EventDetailScreen(
+                                    event: fetchedEvent,
+                                    appUser: appUser,
+                                  ));
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content: Text(
+                                          "Failed to fetch event details")));
+                            }
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("An error occurred")));
+                          }
+                        },
+                        child: EventCard(
+                            event: event, showDate: false, appUser: appUser),
+                      );
+                    }).toList(),
+                  ),
                   Center(
                     child: AnimatedSmoothIndicator(
                       activeIndex: currentIndex,

@@ -2,7 +2,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:my_test_app_flavors/core/serviceLocator.dart';
 import 'package:my_test_app_flavors/modules/events/services/event_provider.dart';
+import 'package:my_test_app_flavors/modules/events/ticket/services/ticket_provider.dart';
 import 'package:provider/provider.dart';
 import 'core/constants/app_theme.dart';
 import 'core/services/hive_services.dart';
@@ -27,19 +29,20 @@ Future<void> main() async {
   await HiveService.init();
   WidgetsFlutterBinding.ensureInitialized();
 
-  // const bool isProduction = bool.fromEnvironment('dart.vm.product');
-  // const bool isStaging = bool.fromEnvironment('FLAVOR_STAGING');
-  // const bool isDevelopment = !isProduction && !isStaging;
+  const bool isProduction = bool.fromEnvironment('dart.vm.product');
+  const bool isStaging = bool.fromEnvironment('FLAVOR_STAGING');
+  const bool isDevelopment = !isProduction && !isStaging;
 
-  // FirebaseOptions firebaseOptions;
+  FirebaseOptions firebaseOptions;
+  ServiceLocator();
 
-  // if (isProduction) {
-  //   firebaseOptions = prod_options.DefaultFirebaseOptions.currentPlatform;
-  // } else if (isStaging) {
-  //   firebaseOptions = stg_options.DefaultFirebaseOptions.currentPlatform;
-  // } else {
-  //   firebaseOptions = dev_options.DefaultFirebaseOptions.currentPlatform;
-  // }
+  if (isProduction) {
+    firebaseOptions = prod_options.DefaultFirebaseOptions.currentPlatform;
+  } else if (isStaging) {
+    firebaseOptions = stg_options.DefaultFirebaseOptions.currentPlatform;
+  } else {
+    firebaseOptions = dev_options.DefaultFirebaseOptions.currentPlatform;
+  }
 
   await Firebase.initializeApp(
     options: dev_options.DefaultFirebaseOptions.currentPlatform,
@@ -62,6 +65,7 @@ class App extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ProfileProvider()),
         ChangeNotifierProvider(create: (_) => NavigationProvider()),
         ChangeNotifierProvider(create: (_) => SpeakerProvider()),
+        ChangeNotifierProvider(create: (_) => TicketProvider()),
       ],
       child: ScreenUtilInit(
         designSize: const Size(375, 812),

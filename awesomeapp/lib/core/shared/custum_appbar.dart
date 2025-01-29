@@ -28,10 +28,13 @@ class CustomAppBar extends StatelessWidget {
                 onTap: () {
                   Navigator.pop(context);
                 },
-                child: SvgPicture.asset(
-                  iconPath,
-                  height: 25.h,
-                  width: 15.w,
+                child: Container(
+                  padding: EdgeInsets.all(5), 
+                  child: SvgPicture.asset(
+                    iconPath,
+                    height: 25.h,
+                    width: 15.w,
+                  ),
                 ),
               ),
               SizedBox(width: 110.w),

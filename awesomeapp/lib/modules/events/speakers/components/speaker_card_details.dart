@@ -107,7 +107,7 @@ class SpeakerCardDetails extends StatelessWidget {
           child: _buildStatItem(
             icon: 'assets/experience.svg',
             title: 'Experience',
-            value: '${speaker.experience}+ Years',
+            value: '${speaker.yearOfExperience}+ Years',
           ),
         ),
       ],

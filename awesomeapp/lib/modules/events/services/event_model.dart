@@ -1,6 +1,7 @@
 import 'package:intl/intl.dart';
 
 class EventModel {
+  String eventId;
   String posterUrl;
   String startDate;
   String endDate;
@@ -9,22 +10,25 @@ class EventModel {
   String time;
 
   EventModel({
+    required this.eventId,
+    required this.title,
+    required this.time,
+    required this.venue,
+    required this.endDate,
     required this.posterUrl,
     required this.startDate,
-    required this.venue,
-    required this.title,
-    required this.endDate,
-    required this.time,
   });
 
   factory EventModel.fromJson(Map<String, dynamic> json) {
+    
     return EventModel(
-      posterUrl: json['posterUrl'] ?? '',
-      startDate: json['startDate'] ?? '',
-      endDate: json['endDate'] ?? '',
-      venue: json['venue'] ?? '',
+      eventId: json['_id'] ?? '',
       title: json['title'] ?? '',
       time: json['time'] ?? '',
+      venue: json['venue'] ?? '',
+      endDate: json['endDate'] ?? '',
+      posterUrl: json['posterUrl'] ?? '',
+      startDate: json['startDate'] ?? '',
     );
   }
 

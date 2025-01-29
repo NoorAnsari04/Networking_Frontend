@@ -50,26 +50,29 @@ class _LoginScreenState extends State<LoginScreen> {
       final authProc =
           Provider.of<AuthenticationProvider>(context, listen: false);
       final success = await authProc.login(
+        context,
         _emailController.text,
-        _passwordController.text,
+        _passwordController.text
       );
 
       if (!mounted) return;
 
       if (success) {
+        print('Navigation to Home Screen');
         await AuthenticationProvider.saveUserCredentials(
           _emailController.text,
           _passwordController.text,
           _rememberMe,
         );
-        context.showSnackBar('Login Successful');
+        // context.showSnackBar('Login Successful');
 
         context.goNamed(
           HomeScreen.id,
         );
-      } else {
-        context.showSnackBar('Login failed');
       }
+      // } else {
+      //   context.showSnackBar('Login failed');
+      // }
     }
   }
 

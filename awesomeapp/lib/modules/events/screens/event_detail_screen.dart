@@ -4,18 +4,29 @@ import 'package:go_router/go_router.dart';
 import 'package:my_test_app_flavors/modules/auth/services/app_user.dart';
 import 'package:my_test_app_flavors/modules/events/components/event_poster.dart';
 import 'package:my_test_app_flavors/modules/events/screens/ticket_screen.dart';
+import 'package:my_test_app_flavors/modules/events/services/event_provider.dart';
+import 'package:my_test_app_flavors/modules/events/speakers/services/speaker_provider.dart';
+import 'package:my_test_app_flavors/modules/events/ticket/services/ticket_provider.dart';
+import 'package:provider/provider.dart';
 import '../components/grid_items.dart';
 import '../services/event_model.dart';
 import '../speakers/screens/speakers_screen.dart';
 import '../swipe and connect/screens/swipe_and_connect.dart';
 
-class EventDetailScreen extends StatelessWidget {
+class EventDetailScreen extends StatefulWidget {
   static const id = 'eventDetails';
   final EventModel event;
   final AppUser appUser;
 
-  EventDetailScreen({required this.event, required this.appUser});
+  const EventDetailScreen(
+      {Key? key, required this.event, required this.appUser})
+      : super(key: key);
 
+  @override
+  State<EventDetailScreen> createState() => _EventDetailScreenState();
+}
+
+class _EventDetailScreenState extends State<EventDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,13 +39,13 @@ class EventDetailScreen extends StatelessWidget {
                 alignment: Alignment.centerLeft,
                 child: SafeArea(
                   child: Text(
-                    event.title,
+                    widget.event.title,
                     style: TextStyle(fontSize: 28.sp),
                   ),
                 ),
               ),
             ),
-            EventImageWidget(event: event),
+            EventImageWidget(event: widget.event),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.w),
               child: Container(
@@ -49,16 +60,32 @@ class EventDetailScreen extends StatelessWidget {
                       height: 179.92.h,
                       top: 0.h,
                       left: 0.w,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => TicketScreen(
-                              appUser: appUser,
-                              eventModel: event,
-                            ),
-                          ),
-                        );
+                      onTap: () async {
+                        final ticketProvider =
+                            Provider.of<TicketProvider>(context, listen: false);
+                        showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (context) => Center(
+                                  child: CircularProgressIndicator(),
+                                ));
+                        try {
+                          await ticketProvider
+                              .fetchTicketDetails(widget.event.eventId);
+                          Navigator.pop(context);
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => TicketScreen(
+                                      appUser: widget.appUser,
+                                      eventModel: widget.event,
+                                      ticketDetails:
+                                          ticketProvider.ticketDetails)));
+                        } catch (e) {
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("Failed to load ticket")));
+                        }
                       },
                     ),
                     GridItems(
@@ -77,8 +104,19 @@ class EventDetailScreen extends StatelessWidget {
                       height: 93.h,
                       top: 185.h,
                       left: 0.w,
-                      onTap: () {
-                        context.pushNamed(SpeakersScreen.id);
+                      onTap: () async {
+                        final speakerProvider = Provider.of<SpeakerProvider>(
+                            context,
+                            listen: false);
+                        try {
+                          await speakerProvider
+                              .fetchSpeakers(widget.event.eventId);
+                          context.pushNamed(SpeakersScreen.id);
+                        } catch (e) {
+                          print("Error fetching speakers: $e");
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text('Failed to load speakers.')));
+                        }
                       },
                     ),
                     GridItems(

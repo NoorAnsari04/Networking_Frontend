@@ -29,11 +29,11 @@ class BackgroundConnectWidget extends StatelessWidget {
             imageUrl: connect.imageUrl,
             name: connect.name,
             lastName: connect.lastName,
-            isStudent: connect.isStudent ?? false,
-            company: connect.isStudent ?? false
+            isStudent: connect.userType == 'Student',
+            company: connect.userType == 'Student'
                 ? connect.instituteName ?? ''
                 : connect.company ?? '',
-            position: connect.isStudent ?? false
+            position: connect.userType == 'Student'
                 ? connect.degreeProgram ?? ''
                 : connect.position ?? '',
             interests: connect.interests ?? [],

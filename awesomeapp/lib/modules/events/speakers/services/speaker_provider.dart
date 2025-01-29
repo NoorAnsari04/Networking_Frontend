@@ -24,13 +24,18 @@ class SpeakerProvider with ChangeNotifier {
     return _auth.currentUser?.uid;
   }
 
-  Future<void> fetchSpeakers() async {
+  Future<void> fetchSpeakers(String eventId) async {
     _isLoading = true;
     notifyListeners();
-
-    _speakers = await _speakerNetworking.fetchSpeakers();
+    try {
+    _speakers = await _speakerNetworking.fetchSpeakersByEventId(eventId);
+    } catch (e) {
+      print("Error fetching speakers: $e");
+      _speakers =[];
+    }finally{
     _isLoading = false;
     notifyListeners();
+    }
   }
 
   Future<bool> isCurrentUserSpeaker() async {

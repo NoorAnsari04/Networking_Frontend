@@ -13,7 +13,7 @@ class PreferencesScreen extends StatefulWidget {
 }
 
 class _PreferencesScreenState extends State<PreferencesScreen> {
-  bool isStudent = true;
+  String userType = 'Student';
   String? selectedProfession;
   String? selectedIndustry;
   TextEditingController reasonController = TextEditingController();
@@ -69,16 +69,16 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
               ),
               SizedBox(height: 40.h),
               UserTypeSelection(
-                isStudent: isStudent,
+                userType: userType,
                 onChanged: (value) {
                   setState(() {
-                    isStudent = value!;
+                    userType = value!;
                   });
                 },
                 title: 'Whom do you want to connect with?',
               ),
               SizedBox(height: 20.h),
-              if (!isStudent) ...[
+              if (userType == 'Industry Person') ...[
                 Text('Profession:', style: TextStyle(fontSize: 16.sp)),
                 Container(
                   decoration: BoxDecoration(

@@ -29,18 +29,33 @@ class AuthenticationProvider with ChangeNotifier {
     _appUser = _hiveService.getUser();
   }
 
-  Future<bool> login(String email, String password) async {
-    _setLoading(true);
-    final AppUser? user = await _authNetworking.login(email, password);
-    _setLoading(false);
+  Future<bool> login(
+      BuildContext context, String email, String password) async {
+    try {
+      _setLoading(true);
+      final AppUser? user = await _authNetworking.login(email, password);
+      _setLoading(false);
+      print('User returned from login: $user');
+      // print('Logged in user: ${_appUser?.name}');
 
-    if (user != null) {
-      _appUser = user;
-      _hiveService.saveUser(user);
-      notifyListeners();
+      if (user != null) {
+        _appUser = user;
+        print('Logged in user: ${_appUser?.fullName}');
+        _hiveService.saveUser(user);
+        notifyListeners();
+        return true;
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('Login Failed. Please check your credentials.')));
+        return false;
+      }
+    } catch (e) {
+      _setLoading(false);
+      print('Login Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('An error ocurred during login')));
+      return false;
     }
-
-    return user != null;
   }
 
   Future<bool> signOut() async {
@@ -56,11 +71,38 @@ class AuthenticationProvider with ChangeNotifier {
     return result;
   }
 
-  Future<bool> signUp(String email, String password) async {
-    _setLoading(true);
-    _userCredential = await _authNetworking.signUp(email, password);
-    _setLoading(false);
-    return _userCredential != null;
+  Future<bool> signUp(BuildContext context,
+      {required String email,
+      required String password,
+      required String firstName,
+      required String lastName,
+      required String confirmPassword}) async {
+    try {
+      _setLoading(true);
+      final AppUser? user = await _authNetworking.signUp(
+          email: email,
+          password: password,
+          firstName: firstName,
+          lastname: lastName,
+          confirmPassword: confirmPassword);
+      _setLoading(false);
+      if (user != null) {
+        _appUser = user;
+        _hiveService.saveUser(user);
+        notifyListeners();
+        return true;
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Signup Failed. Please try again')));
+        return false;
+      }
+    } catch (e) {
+      _setLoading(false);
+      print('Error during signup: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("An error ocurred during Signup")));
+      return false;
+    }
   }
 
   Future<void> createUserDocument(Map<String, dynamic> userData,
@@ -146,5 +188,30 @@ class AuthenticationProvider with ChangeNotifier {
       'password': prefs.getString('password') ?? '',
       'rememberMe': prefs.getBool('rememberMe') ?? false,
     };
+  }
+
+  String? authToken() {
+    // if (_appUser != null) {
+    //   return _appUser!.accessToken;
+     return HiveService().getUser()?.accessToken;
+    }
+
+    // return null;
+  
+
+  Future<String?> getAuthToken(String refreshToken) async {
+    try {
+      final newAccessToken =
+          await _authNetworking.refreshAuthToken(refreshToken);
+      if (newAccessToken != null) {
+        _appUser?.accessToken = newAccessToken;
+        _hiveService.saveUser(_appUser!);
+        notifyListeners();
+        return newAccessToken;
+      }
+    } catch (e) {
+      print("Error fetching new auth token: $e");
+    }
+    return null;
   }
 }

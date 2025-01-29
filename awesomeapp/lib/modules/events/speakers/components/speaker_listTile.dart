@@ -28,7 +28,7 @@ class SpeakerListTile extends StatelessWidget {
           backgroundImage: NetworkImage(speaker.imageUrl ?? ''),
         ),
         title: Text(
-          speaker.fullName ?? '',
+          speaker.fullName,
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 16.sp,

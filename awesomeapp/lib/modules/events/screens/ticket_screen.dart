@@ -13,7 +13,7 @@ class TicketScreen extends StatelessWidget {
   final AppUser appUser;
   final EventModel eventModel;
 
-  TicketScreen({required this.appUser, required this.eventModel});
+  TicketScreen({required this.appUser, required this.eventModel, Map<String, dynamic>? ticketDetails});
 
   @override
   Widget build(BuildContext context) {

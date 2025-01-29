@@ -167,11 +167,9 @@ class _SwipeAndConnectScreenState extends State<SwipeAndConnectScreen> {
                                             lastName: provider
                                                 .attendees[index].lastName,
                                             isStudent: provider.attendees[index]
-                                                    .isStudent ??
-                                                false,
+                                                    .userType == 'Student',
                                             company: provider.attendees[index]
-                                                        .isStudent ??
-                                                    false
+                                                        .userType == 'Student'
                                                 ? provider.attendees[index]
                                                         .instituteName ??
                                                     ''
@@ -179,8 +177,7 @@ class _SwipeAndConnectScreenState extends State<SwipeAndConnectScreen> {
                                                         .company ??
                                                     '',
                                             position: provider.attendees[index]
-                                                        .isStudent ??
-                                                    false
+                                                        .userType == 'Student'
                                                 ? provider.attendees[index]
                                                         .degreeProgram ??
                                                     ''

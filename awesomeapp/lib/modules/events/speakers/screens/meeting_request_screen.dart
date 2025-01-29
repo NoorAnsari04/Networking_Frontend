@@ -47,7 +47,7 @@ class _MeetingRequestScreenState extends State<MeetingRequestScreen> {
     _isStudentRequest = widget.isViewOnly
         ? (widget.requestData?['university'] != null ||
             widget.requestData?['degreeProgram'] != null)
-        : (_authProvider.appUser!.isStudent ?? false);
+        : (_authProvider.appUser!.userType == 'Student');
 
     if (widget.requestData != null) {
       _meetingTitleController =
