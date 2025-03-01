@@ -5,7 +5,6 @@ import 'package:dio/dio.dart';
 import 'package:my_test_app_flavors/core/services/hive_services.dart';
 import 'app_user.dart';
 import '../../../core/constants/api_constants.dart'; // Relative path
-import 'package:fluttertoast/fluttertoast.dart';
 
 class AuthNetworking {
   FirebaseAuth firebaseAuth = FirebaseAuth.instance;

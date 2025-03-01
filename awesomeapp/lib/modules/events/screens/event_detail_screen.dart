@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:my_test_app_flavors/modules/auth/services/app_user.dart';
 import 'package:my_test_app_flavors/modules/events/components/event_poster.dart';
 import 'package:my_test_app_flavors/modules/events/screens/ticket_screen.dart';
-import 'package:my_test_app_flavors/modules/events/services/event_provider.dart';
 import 'package:my_test_app_flavors/modules/events/speakers/services/speaker_provider.dart';
 import 'package:my_test_app_flavors/modules/events/ticket/services/ticket_provider.dart';
 import 'package:provider/provider.dart';

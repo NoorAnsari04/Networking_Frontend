@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:my_test_app_flavors/core/serviceLocator.dart';
 import 'package:my_test_app_flavors/modules/auth/services/auth_provider.dart';
 import '../../../core/constants/dio_client.dart';

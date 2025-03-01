@@ -1,4 +1,3 @@
-import 'package:intl/intl.dart';
 import '../../../events/services/event_model.dart';
 
 class TicketModel {

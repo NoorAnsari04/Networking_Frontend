@@ -72,6 +72,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
         UserTypeSelection(
           userType: userType,
           onChanged: (value) {
+            if (!mounted) return;
             setState(() {
               userType = value!;
             });
@@ -88,13 +89,16 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
         SizedBox(height: 10),
         CustomElevatedButton(
           manualAction: true,
-          onPressed: () => submitForm(
-            context,
-            _formKey,
-            formData,
-            widget.signupData,
-            isGoogleSignIn: widget.isGoogleSignIn,
-          ),
+          onPressed: () {
+            if (!mounted) return;
+            submitForm(
+              context,
+              _formKey,
+              formData,
+              widget.signupData,
+              isGoogleSignIn: widget.isGoogleSignIn,
+            );
+          },
           text: 'Submit',
         ),
       ],

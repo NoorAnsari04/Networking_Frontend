@@ -60,59 +60,29 @@ class AppUser {
 
   List<String>? interests;
 
-  AppUser(
-      {required this.id,
-      required this.name,
-      required this.email,
-      required this.lastName,
-      required this.position,
-      required this.company,
-      required this.description,
-      required this.imageUrl,
-      required this.yearOfExperience,
-      required this.linkedinUrl,
-      required this.sessionsDeliver,
-      this.isReceivedRequest = false,
-      this.userType,
-      required this.degreeProgram,
-      required this.yearOfGraduation,
-      required this.instituteName,
-      this.interests,
-      this.accessToken,
-      this.refreshToken});
-
-//   factory AppUser.fromJson(Map<String, dynamic> json) {
-//     log(jsonEncode(json));
-//   final user = json['user'] as Map<String, dynamic>? ?? {};
-//   return AppUser(
-//     id: user['_id'] ?? '',
-//     name: user['firstName'] ?? 'unknown',  // Map firstName correctly
-//     email: user['email'] ?? '',
-//     lastName: user['lastName'] ?? 'unknown', // Map lastName correctly
-//     position: user['designation'],
-//     company: user['company'],
-//     description: user['description'],
-//     imageUrl: user['imageUrl'],
-//     sessionsDeliver: user['sessionsDeliver'],
-//     experience: user['experience'],
-//     linkedinUrl: user['linkedinUrl'],
-//     isReceivedRequest: user['isReceivedRequest'] ?? false,
-//     isStudent: user['isStudent'] ?? false,
-//     degreeProgram: user['degreeProgram'],
-//     yearOfGraduation: user['yearOfGraduation'],
-//     instituteName: user['instituteName'],
-//     interests: (user['interests'] as List<dynamic>?)?.cast<String>(),
-//     accessToken: json['accessToken'],
-//     refreshToken: json['refreshToken'],
-//   );
-// }
-
-  
+  AppUser({
+    required this.id,
+    required this.name,
+    required this.email,
+    required this.lastName,
+    required this.position,
+    required this.company,
+    required this.description,
+    required this.imageUrl,
+    required this.yearOfExperience,
+    required this.linkedinUrl,
+    required this.sessionsDeliver,
+    this.isReceivedRequest = false,
+    this.userType,
+    required this.degreeProgram,
+    required this.yearOfGraduation,
+    required this.instituteName,
+    this.interests,
+    this.accessToken,
+    this.refreshToken,
+  });
 
   factory AppUser.fromJson(Map<String, dynamic> jsonUser) {
-    // log(jsonEncode(json));
-    // final jsonUser = json;
-    // var jsonUser=json["user"];
     return AppUser(
       id: jsonUser['_id'] ?? '',
       name: jsonUser['firstName'] ?? '',
@@ -126,7 +96,7 @@ class AppUser {
       yearOfExperience: jsonUser['yearOfExperience'],
       linkedinUrl: jsonUser['linkedInUrl'],
       isReceivedRequest: jsonUser['isReceivedRequest'] ?? false,
-      userType: jsonUser['userType'] ,
+      userType: jsonUser['userType'],
       degreeProgram: jsonUser['degreeProgram'],
       yearOfGraduation: jsonUser['yearOfGraduation'],
       instituteName: jsonUser['instituteName'],
@@ -138,29 +108,34 @@ class AppUser {
 
   Map<String, dynamic> toJson() {
     return {
-      'name': name,
+      '_id': id,
+      'firstName': name,
+      'lastName': lastName,
       'email': email,
-      'accessToken': accessToken,
-      'linkedInUrl': linkedinUrl,
+      'designation': position,
+      'company': company,
       'description': description,
-      'company' : company,
-
+      'imageUrl': imageUrl,
+      'sessionsDeliver': sessionsDeliver,
+      'yearOfExperience': yearOfExperience,
+      'linkedInUrl': linkedinUrl,
+      'isReceivedRequest': isReceivedRequest,
+      'userType': userType,
+      'degreeProgram': degreeProgram,
+      'yearOfGraduation': yearOfGraduation,
+      'instituteName': instituteName,
+      'interests': interests,
+      'accessToken': accessToken,
+      'refreshToken': refreshToken,
     };
   }
 
-  // String get fullName {
-  //   final firstName = name.isNotEmpty ? name : '';
-  //   final lastNamePart = lastName.isNotEmpty ? lastName : '';
-  //   return [firstName, lastNamePart].where((part) => part.isNotEmpty).join(' ');
-  // }
-
   String get fullName {
-  final List<String> nameParts = [];
-  if (name.isNotEmpty) nameParts.add(name);
-  if (lastName.isNotEmpty) nameParts.add(lastName);
-  return nameParts.join(' ').trim();
-}
- 
+    final List<String> nameParts = [];
+    if (name.isNotEmpty) nameParts.add(name);
+    if (lastName.isNotEmpty) nameParts.add(lastName);
+    return nameParts.join(' ').trim();
+  }
 
   AppUser copyWith({
     String? id,
@@ -196,7 +171,7 @@ class AppUser {
       yearOfExperience: experience ?? this.yearOfExperience,
       linkedinUrl: linkedinUrl ?? this.linkedinUrl,
       isReceivedRequest: isReceivedRequest ?? this.isReceivedRequest,
-      userType: userType?? this.userType,
+      userType: userType ?? this.userType,
       degreeProgram: degreeProgram ?? this.degreeProgram,
       yearOfGraduation: yearOfGraduation ?? this.yearOfGraduation,
       instituteName: instituteName ?? this.instituteName,

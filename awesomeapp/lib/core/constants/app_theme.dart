@@ -5,6 +5,7 @@ import 'font_constants.dart';
 
 ThemeData theme(BuildContext context) {
   return ThemeData(
+    useMaterial3: false,
     colorScheme: ColorScheme.fromSwatch().copyWith(
       primary: ColorConstants.primaryColor,
       secondary: ColorConstants.primaryColor,

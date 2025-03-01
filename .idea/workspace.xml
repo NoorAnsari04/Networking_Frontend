@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="NONE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="837ce4d2-d355-482d-98f5-85de69dc3ab3" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/awesomeapp/.metadata" beforeDir="false" afterPath="$PROJECT_DIR$/awesomeapp/.metadata" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/awesomeapp/android/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/awesomeapp/android/app/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/awesomeapp/android/app/src/main/AndroidManifest.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/awesomeapp/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/awesomeapp/lib/main.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/awesomeapp/linux/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/awesomeapp/linux/flutter/generated_plugin_registrant.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/awesomeapp/linux/flutter/generated_plugin_registrant.h" beforeDir="false" afterPath="$PROJECT_DIR$/awesomeapp/linux/flutter/generated_plugin_registrant.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/awesomeapp/linux/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/awesomeapp/linux/flutter/generated_plugins.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/awesomeapp/macos/Flutter/GeneratedPluginRegistrant.swift" beforeDir="false" afterPath="$PROJECT_DIR$/awesomeapp/macos/Flutter/GeneratedPluginRegistrant.swift" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/awesomeapp/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/awesomeapp/pubspec.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/awesomeapp/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/awesomeapp/pubspec.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/awesomeapp/windows/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/awesomeapp/windows/flutter/generated_plugin_registrant.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/awesomeapp/windows/flutter/generated_plugin_registrant.h" beforeDir="false" afterPath="$PROJECT_DIR$/awesomeapp/windows/flutter/generated_plugin_registrant.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/awesomeapp/windows/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/awesomeapp/windows/flutter/generated_plugins.cmake" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 4
+}</component>
+  <component name="ProjectId" id="2tDMfE6YUp1gAT7B0BjxEHpw6Ss" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "api__integrated",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/RT/Networking_Frontend/awesomeapp",
+    "settings.editor.selected.configurable": "dart.settings",
+    "show.migrate.to.gradle.popup": "false"
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="837ce4d2-d355-482d-98f5-85de69dc3ab3" name="Changes" comment="" />
+      <created>1739882292750</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1739882292750</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

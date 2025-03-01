@@ -1,5 +1,4 @@
 import 'package:my_test_app_flavors/modules/events/services/event_networking.dart';
-import 'package:provider/provider.dart';
 
 import '../../auth/services/app_user.dart';
 import '../services/event_model.dart';
