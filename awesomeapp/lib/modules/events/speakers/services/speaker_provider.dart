@@ -82,12 +82,20 @@ class SpeakerProvider with ChangeNotifier {
 
   List<AppUser> filterSpeakers(String query) {
     if (query.isEmpty) {
-      return _speakers;
+      return _speakers; // Return all speakers if the query is empty
     } else {
       final lowerCaseQuery = query.toLowerCase();
       return _speakers.where((speaker) {
-        final name = speaker.name.toLowerCase();
-        return name.contains(lowerCaseQuery);
+        // Check multiple fields for a match
+        final fullName = speaker.fullName.toLowerCase();
+        final company = speaker.company?.toLowerCase() ?? '';
+        final position = speaker.position?.toLowerCase() ?? '';
+        final instituteName = speaker.instituteName?.toLowerCase() ?? '';
+
+        return fullName.contains(lowerCaseQuery) ||
+            company.contains(lowerCaseQuery) ||
+            position.contains(lowerCaseQuery) ||
+            instituteName.contains(lowerCaseQuery);
       }).toList();
     }
   }

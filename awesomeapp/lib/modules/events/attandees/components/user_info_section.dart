@@ -43,11 +43,13 @@ class UserInfoSection extends StatelessWidget {
               height: 24.h,
             ),
             SizedBox(width: 8.w),
-            Text(
-              isStudent
-                  ? '${user?.instituteName ?? ''}'
-                  : '${user?.company ?? ''}',
-              style: kRaleway,
+            Flexible( // Add Flexible to avoid overflow
+              child: Text(
+                isStudent
+                    ? '${user?.instituteName ?? 'No Institute'}'
+                    : '${user?.company ?? 'No Company'}',
+                style: kRaleway,
+              ),
             ),
           ],
         ),

@@ -23,18 +23,11 @@ class _SpeakersScreenState extends State<SpeakersScreen> {
   List<AppUser> _filteredSpeakers = [];
   bool _isCurrentUserSpeaker = false;
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   WidgetsBinding.instance.addPostFrameCallback((_) async {
-  //     final speakerProvider =
-  //         Provider.of<SpeakerProvider>(context, listen: false);
-  //     await speakerProvider.fetchSpeakers(event);
-  //     _isCurrentUserSpeaker = await speakerProvider.isCurrentUserSpeaker();
-  //   });
-
-  //   _searchController.addListener(_filterSpeakers);
-  // }
+  @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(_filterSpeakers); // Add listener
+  }
 
   @override
   void dispose() {
@@ -44,10 +37,15 @@ class _SpeakersScreenState extends State<SpeakersScreen> {
   }
 
   void _filterSpeakers() {
-    final query = _searchController.text;
+    final query = _searchController.text.toLowerCase();
     final speakerProv = Provider.of<SpeakerProvider>(context, listen: false);
     setState(() {
-      _filteredSpeakers = List.from(speakerProv.filterSpeakers(query));
+      _filteredSpeakers = speakerProv.speakers
+          .where((speaker) =>
+              speaker.fullName.toLowerCase().contains(query) ||
+              speaker.position?.toLowerCase().contains(query) == true ||
+              speaker.company?.toLowerCase().contains(query) == true)
+          .toList();
     });
   }
 
@@ -119,7 +117,16 @@ class _SpeakersScreenState extends State<SpeakersScreen> {
             padding: const EdgeInsets.all(16.0),
             child: TextField(
               controller: _searchController,
-              decoration: searchInputDecoration,
+              decoration: InputDecoration(
+                hintText: 'Search speakers...',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+              ),
+              onChanged: (value) {
+                _filterSpeakers(); // Trigger filtering on text change
+              },
             ),
           ),
           Expanded(

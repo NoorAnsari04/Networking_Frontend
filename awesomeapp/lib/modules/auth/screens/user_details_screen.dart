@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:my_test_app_flavors/modules/auth/components/form_data.dart';
+import 'package:provider/provider.dart';
 import '../../../core/constants/color_constants.dart';
 import '../../../core/constants/icon_constants.dart';
 import '../../../core/shared/custom_elevated_button.dart';
@@ -8,6 +9,7 @@ import '../components/comman_details_form.dart';
 import '../components/industry_person_form.dart';
 import '../components/student_details_form.dart';
 import '../components/user_type_selection.dart';
+import '../services/auth_provider.dart';
 import '../services/submit_form.dart';
 
 class UserDetailsScreen extends StatefulWidget {
@@ -97,6 +99,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
               formData,
               widget.signupData,
               isGoogleSignIn: widget.isGoogleSignIn,
+              authProvider: Provider.of<AuthenticationProvider>(context, listen: false)
             );
           },
           text: 'Submit',

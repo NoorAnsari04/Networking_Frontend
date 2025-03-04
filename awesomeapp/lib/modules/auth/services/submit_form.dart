@@ -15,13 +15,17 @@ import '../services/auth_provider.dart';
 import 'package:dio/dio.dart' as dio;
 
 void submitForm(
+    
   BuildContext context,
   GlobalKey<FormState> formKey,
   FormData formData,
   Map<String, dynamic> signupData, {
   bool isGoogleSignIn = false,
+      required AuthenticationProvider authProvider,
 }) async {
+
   if (formKey.currentState!.validate()) {
+    // final AuthenticationProvider authProvider;
     final dio.FormData formDatas = dio.FormData.fromMap({
       'userType': formData.selectedYear != null ? 'Student' : 'Industry Person',
       'company': formData.companyController.text.isNotEmpty
@@ -69,6 +73,7 @@ void submitForm(
 
         final Map<String, dynamic> userData = response.data['data']['user'] ?? {};
         userData['accessToken'] = response.data['data']['accessToken'] ?? token;
+        authProvider.updateUser(AppUser.fromJson(userData));
         // userData.addAll(response.data['data']['user']);
 
         log("Response data: ${jsonEncode(userData)}");

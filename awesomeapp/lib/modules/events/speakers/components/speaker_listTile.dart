@@ -25,7 +25,9 @@ class SpeakerListTile extends StatelessWidget {
         contentPadding: EdgeInsets.all(16.0),
         leading: CircleAvatar(
           radius: 25.r,
-          backgroundImage: NetworkImage(speaker.imageUrl ?? ''),
+          backgroundImage: NetworkImage(speaker.imageUrl?.isNotEmpty == true
+              ? speaker.imageUrl!
+              : 'https://via.placeholder.com/150'),
         ),
         title: Text(
           speaker.fullName,
