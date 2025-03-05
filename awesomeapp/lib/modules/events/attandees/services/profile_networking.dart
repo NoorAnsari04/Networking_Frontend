@@ -32,6 +32,9 @@ class ProfileNetworking {
     try {
       // await _firestore.collection('users').doc(id).update(UserDetails);
       // return true;
+
+
+
       final Map<String, dynamic> updatedData = {
         if (UserDetails['name'] != null) 'name': UserDetails['name'],
         if (UserDetails['company'] != null) 'company': UserDetails['company'],
@@ -47,7 +50,12 @@ class ProfileNetworking {
       updatedData['profileImg'] = profileImgPath;
     
       final url = ApiConstants.baseUrl + ApiConstants.editProfile;
+      // String? token = serviceLocator<AuthenticationProvider>().authToken();
       String? token = serviceLocator<AuthenticationProvider>().authToken();
+      if(token == null){
+        print("Token is null. User is not authenticated");
+        return false;
+      }
       final dioInstance = DioClient.getDioInstance();
       final response = await dioInstance.put(url,
           data: updatedData,

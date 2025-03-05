@@ -62,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: EdgeInsets.only(left: 16.w, top: 10.h),
                     child: SafeArea(
                       child: Text(
-                        '${EventModel.getGreeting()} ${appUser.name}',
+                        '${EventModel.getGreeting()} ${appUser.fullName}',
                         style: ktopTextStyle.copyWith(
                           fontSize: 16.0.sp,
                           fontWeight: FontWeight.bold,

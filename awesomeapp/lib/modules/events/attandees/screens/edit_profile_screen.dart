@@ -109,8 +109,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       if (_image != null) {
         imageUrl = await _profileProvider.uploadImage(_image!);
       }
+      final nameParts = _nameController.text.split(" ");
+      final firstName = nameParts [0];
+      final lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
+
       final userData = {
-        'name': _nameController.text,
+        'name': firstName,
+        'lastName' : lastName,
         'email': _emailController.text,
         'description': _descriptionController.text,
         'linkedInUrl': _linkedinController.text,
@@ -138,8 +143,28 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         setState(() {
           _imageUrl = imageUrl;
         });
+
+        final updatedUser = AppUser(
+          id: _authProvider.appUser!.id,
+          name: firstName,
+          lastName: lastName,
+          email: _emailController.text,
+          description: _descriptionController.text,
+          linkedinUrl: _linkedinController.text,
+          imageUrl: imageUrl,
+          userType: _isStudent ? 'Student' : 'Industry Person',
+          degreeProgram: _isStudent ? _degreeProgramController.text : null,
+          yearOfGraduation: _isStudent ? _yearOfGraduationController.text : null,
+          instituteName: _isStudent ? _instituteNameController.text : null,
+          company: _isStudent ? null : _companyController.text,
+          position: _isStudent ? null : _positionController.text,
+          yearOfExperience: _isStudent ? null : _experienceController.text,
+          sessionsDeliver:_authProvider.appUser!.sessionsDeliver
+        );
+
+        _authProvider.updateUser(updatedUser);
         context.showSnackBar('Profile updated Successfully');
-        _authProvider.updateUser(userData as AppUser);
+        // _authProvider.updateUser(userData as AppUser);
         Navigator.pop(context, true);
       }
     }

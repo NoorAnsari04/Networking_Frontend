@@ -7,38 +7,39 @@ import '../constants/font_constants.dart';
 class CustomAppBar extends StatelessWidget {
   final String title;
   final String iconPath;
-  final Color? titleColor; // Add a titleColor parameter
+  final Color? titleColor;
 
   const CustomAppBar({
     Key? key,
     required this.title,
     required this.iconPath,
-    this.titleColor, // Add a titleColor parameter
+    this.titleColor,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Padding(
-          padding: EdgeInsets.only(top: 50.0.w, left: 10, right: 10),
-          child: Row(
-            children: [
-              GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: Container(
-                  padding: EdgeInsets.all(5), 
-                  child: SvgPicture.asset(
-                    iconPath,
-                    height: 25.h,
-                    width: 15.w,
-                  ),
-                ),
+    return Padding(
+      padding: EdgeInsets.only(top: 50.0.w), // Adjust top padding as needed
+      child: Row(
+        children: [
+          // Back Button
+          GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: Container(
+              padding: EdgeInsets.all(5),
+              child: SvgPicture.asset(
+                iconPath,
+                height: 25.h,
+                width: 15.w,
               ),
-              SizedBox(width: 110.w),
-              Text(
+            ),
+          ),
+          // Spacer to push the title to the center
+          Expanded(
+            child: Center(
+              child: Text(
                 title,
                 textAlign: TextAlign.center,
                 style: ktopTextStyle.copyWith(
@@ -46,10 +47,12 @@ class CustomAppBar extends StatelessWidget {
                   color: titleColor,
                 ),
               ),
-            ],
+            ),
           ),
-        ),
-      ],
+          // Placeholder to balance the Row (optional)
+          SizedBox(width: 40.w), // Adjust width to match the back button's size
+        ],
+      ),
     );
   }
 }
