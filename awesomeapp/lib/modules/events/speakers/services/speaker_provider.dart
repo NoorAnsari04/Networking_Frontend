@@ -1,8 +1,10 @@
+// import 'dart:nativewrappers/_internal/vm/lib/core_patch.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:my_test_app_flavors/modules/auth/services/app_user.dart';
 import 'package:my_test_app_flavors/modules/events/speakers/services/speaker_networking.dart';
-
+import 'package:flutter/foundation.dart';
 import 'meeting_request_model.dart';
 
 class SpeakerProvider with ChangeNotifier {
@@ -11,14 +13,17 @@ class SpeakerProvider with ChangeNotifier {
   List<AppUser> _speakers = [];
   List<Map<String, dynamic>> _meetingRequests = [];
   bool _isLoading = false;
+  String? _errorMessage;
 
   List<Map<String, dynamic>> get meetingRequests => _meetingRequests;
+
+  bool get isLoading => _isLoading;
+
+  String? get errorMessage => _errorMessage;
 
   List<AppUser> get speakers => _speakers;
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  bool get isLoading => _isLoading;
 
   String? getCurrentUserId() {
     return _auth.currentUser?.uid;
@@ -28,13 +33,13 @@ class SpeakerProvider with ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-    _speakers = await _speakerNetworking.fetchSpeakersByEventId(eventId);
+      _speakers = await _speakerNetworking.fetchSpeakersByEventId(eventId);
     } catch (e) {
       print("Error fetching speakers: $e");
-      _speakers =[];
-    }finally{
-    _isLoading = false;
-    notifyListeners();
+      _speakers = [];
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
@@ -46,11 +51,18 @@ class SpeakerProvider with ChangeNotifier {
 
   Future<void> fetchMeetingRequests() async {
     _isLoading = true;
+    _errorMessage = null;
     notifyListeners();
-
-    _meetingRequests = await _speakerNetworking.fetchMeetingRequests();
-    _isLoading = false;
-    notifyListeners();
+    try {
+      _meetingRequests = await _speakerNetworking.fetchMeetingRequests();
+    } catch (e) {
+      _errorMessage = "Failed to fetch meeting requests: $e";
+      print(_errorMessage);
+      _meetingRequests = [];
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<void> createMeetingRequest(MeetingRequest request) async {
@@ -64,20 +76,36 @@ class SpeakerProvider with ChangeNotifier {
     return res;
   }
 
-  Future<void> acceptMeetingRequest(String requestId, String senderId) async {
-    final receiverId = _auth.currentUser?.uid ?? '';
-    await _speakerNetworking.acceptMeetingRequest(
-        requestId, senderId, receiverId);
+  // Future<void> acceptMeetingRequest(String requestId, String senderId) async {
+  //   final receiverId = _auth.currentUser?.uid ?? '';
+  //   await _speakerNetworking.acceptMeetingRequest(
+  //       requestId, senderId, receiverId);
+  //   _meetingRequests
+  //       .removeWhere((request) => request['request']['id'] == requestId);
+  //   notifyListeners();
+  // }
+  //
+  // Future<void> rejectMeetingRequest(String requestId) async {
+  //   await _speakerNetworking.rejectMeetingRequest(requestId);
+  //   _meetingRequests
+  //       .removeWhere((request) => request['request']['id'] == requestId);
+  //   notifyListeners();
+  // }
+  Future<void> handleMeetingRequest({
+    required String requestId,
+    required String senderId,
+    required String receiverId,
+    required String action, // 'Approve' or 'Deny'
+  }) async {
+    await _speakerNetworking.handleMeetingRequest(
+      requestId: requestId,
+      senderId: senderId,
+      receiverId: receiverId,
+      action: action,
+    );
     _meetingRequests
         .removeWhere((request) => request['request']['id'] == requestId);
-    notifyListeners();
-  }
-
-  Future<void> rejectMeetingRequest(String requestId) async {
-    await _speakerNetworking.rejectMeetingRequest(requestId);
-    _meetingRequests
-        .removeWhere((request) => request['request']['id'] == requestId);
-    notifyListeners();
+    notifyListeners(); // Notify listeners to update the UI
   }
 
   List<AppUser> filterSpeakers(String query) {

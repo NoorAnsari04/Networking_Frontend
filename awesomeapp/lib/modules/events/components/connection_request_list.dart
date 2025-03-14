@@ -16,6 +16,8 @@ class ConnectionRequestList extends StatelessWidget {
   final String meetingTitle;
   final Map<String, dynamic> requestData;
   final bool isSpeakerRequest;
+  final VoidCallback? onAccept;
+  final VoidCallback? onReject;
 
   ConnectionRequestList({
     required this.user,
@@ -26,6 +28,8 @@ class ConnectionRequestList extends StatelessWidget {
     required this.requestData,
     this.showDenyButton = false,
     this.isSpeakerRequest = false,
+    this.onAccept,
+    this.onReject,
   });
 
   @override
@@ -69,23 +73,31 @@ class ConnectionRequestList extends StatelessWidget {
               if (!isSpeakerRequest) SizedBox(height: 8.h),
               ListTile(
                 contentPadding: EdgeInsets.zero,
-                leading: user.imageUrl != null
+                leading: user.imageUrl != null && user.imageUrl!.isNotEmpty
                     ? CircleAvatar(
-                        backgroundImage: NetworkImage(user.imageUrl as String))
-                    : const CircleAvatar(child: Icon(Icons.person)),
-                title: Text(user.fullName, style: bodyMediumTextStyle),
+                        backgroundImage: NetworkImage(user.imageUrl!),
+                      )
+                    : CircleAvatar(
+                        child: Icon(Icons.person),
+                      ),
+                title: Text(
+                  user.fullName ?? 'Unknown User', // Handle null fullName
+                  style: bodyMediumTextStyle,
+                ),
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      isStudent ? user.instituteName ?? '' : user.company ?? '',
+                      isStudent
+                          ? user.instituteName ?? 'No institute' // Handle null instituteName
+                          : user.company ?? 'No company', // Handle null company
                       style: smallTextStyle.copyWith(
                           fontSize: 10.sp, color: Colors.grey),
                     ),
                     Text(
                       isStudent
-                          ? user.degreeProgram ?? ''
-                          : user.position ?? '',
+                          ? user.degreeProgram ?? 'No degree program'
+                          : user.position ?? 'No position',
                       style: smallTextStyle,
                     ),
                   ],
@@ -95,9 +107,11 @@ class ConnectionRequestList extends StatelessWidget {
               if (isSpeakerRequest)
                 MeetingRequestButtons(
                   requestId: requestId,
-                  sentUserId: sentUserId,
+                  senderId: sentUserId,
                   showDenyButton: showDenyButton,
                   showApproveButton: showApproveButton,
+                  onAccept: onAccept,
+                  onReject: onReject,
                 ),
             ],
           ),

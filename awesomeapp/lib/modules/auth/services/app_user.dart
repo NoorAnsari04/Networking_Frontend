@@ -83,13 +83,13 @@ class AppUser {
   });
 
   factory AppUser.fromJson(Map<String, dynamic> jsonUser) {
-    print('Company from API: ${jsonUser['company']}');
+    // print('Company from API: ${jsonUser['company']}');
     return AppUser(
       id: jsonUser['_id'] ?? '',
       name: jsonUser['firstName'] ?? '',
       email: jsonUser['email'] ?? '',
       lastName: jsonUser['lastName'] ?? '',
-      position: jsonUser['designation'],
+      position:jsonUser['position'] ?? jsonUser['designation'],
       company: jsonUser['company'],
       description: jsonUser['description'],
       imageUrl: jsonUser['imageUrl'],
@@ -113,6 +113,7 @@ class AppUser {
       'firstName': name,
       'lastName': lastName,
       'email': email,
+      'position': position,
       'designation': position,
       'company': company,
       'description': description,

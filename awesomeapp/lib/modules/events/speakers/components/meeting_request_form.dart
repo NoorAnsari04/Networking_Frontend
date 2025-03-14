@@ -155,7 +155,7 @@ class MeetingRequestForm extends StatelessWidget {
                 else if (isViewOnly)
                   MeetingRequestButtons(
                     requestId: requestData!['id'],
-                    sentUserId: requestData!['senderId'],
+                    senderId: requestData!['senderId'],
                     onAccept: () {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(

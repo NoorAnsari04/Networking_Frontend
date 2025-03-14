@@ -1,5 +1,5 @@
 class ApiConstants {
-  static const String baseUrl = 'http://192.168.18.126:3000';
+  static const String baseUrl = 'http://192.168.100.29:3000';
   static const String login = '/api/auth/login/';
   static const String signUp = '/api/auth/signup/';
   static const String userDetails = '/api/user/update';
@@ -10,7 +10,8 @@ class ApiConstants {
   static const String fetchTicket = '/api/ticket/:conferenceId';
   static const String editProfile = '/api/user/edit';
   static const String socialSignup = '/api/auth/googleSignup';
-
+  static const String pendingRequests = '/api/connect/pending-requests';
+  static const String handleConnectionRequests = '/api/connect/handleConnectRequest';
   static const int connectTimeout = 5000;
   static const int receiveTimeout = 3000;
 }

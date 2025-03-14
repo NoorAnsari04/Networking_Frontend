@@ -61,88 +61,146 @@ class SpeakerNetworking {
           options: dio.Options(headers: {
             "Authorization": "Bearer: $token",
           }));
-          print(response.data);
+      print(response.data);
 
-          if (response.statusCode == 200 && response.data != null) {
-            final Map<String, dynamic> responseData =response.data;
-            final List<dynamic> speakersData = responseData['data']['speakers'];
-            return speakersData.map((json) => AppUser.fromJson(json)).toList();
-          }else{
-            throw Exception("Failed to fetch speakers by event Id");
-          }
+      if (response.statusCode == 200 && response.data != null) {
+        final Map<String, dynamic> responseData = response.data;
+        final List<dynamic> speakersData = responseData['data']['speakers'];
+        return speakersData.map((json) => AppUser.fromJson(json)).toList();
+      } else {
+        throw Exception("Failed to fetch speakers by event Id");
+      }
     } catch (e) {
       print("Error fetching speakers by event ID: $e");
-    throw Exception('Failed to fetch speakers: $e');
+      throw Exception('Failed to fetch speakers: $e');
     }
   }
 
   // todo make func of type List<MeetingRequest>
   Future<List<Map<String, dynamic>>> fetchMeetingRequests() async {
     try {
-      String currentUserId = _auth.currentUser?.uid ?? '';
+      final url = ApiConstants.baseUrl + ApiConstants.pendingRequests;
+      final dioInstance = DioClient.getDioInstance();
+      final currentUserId = _auth.currentUser?.uid ?? '';
 
-      QuerySnapshot requestsSnapshot = await _firestore
-          .collection('meeting_requests')
-          .where('receiverId', isEqualTo: currentUserId)
-          .where('status', isEqualTo: 'pending')
-          .get();
+      // Make the API call
+      final response = await dioInstance.get(url, queryParameters: {
+        'userId': currentUserId,
+      });
 
+      // Check if the API call was successful
+      if (response.statusCode != 200) {
+        throw Exception(
+            "Failed to load pending requests: ${response.statusCode}");
+      }
+
+      // Parse the response data
+      final Map<String, dynamic> responseData = response.data;
+
+      // Check if the API returned any pending requests
+      if (!responseData['success'] ||
+          responseData['data']['pendingRequests'].isEmpty) {
+        throw Exception("No pending requests found");
+      }
+
+      // Get the list of pending requests
+      final List<dynamic> pendingRequests =
+          responseData['data']['pendingRequests'];
       List<Map<String, dynamic>> requests = [];
-      List<MeetingRequest> meetingRequest = [];
 
-      for (var doc in requestsSnapshot.docs) {
-        final requestData = doc.data() as Map<String, dynamic>;
-        final senderId = requestData['senderId'];
+      // Loop through each pending request
+      for (var request in pendingRequests) {
+        // Ensure the request is a Map<String, dynamic>
+        if (request is Map<String, dynamic>) {
+          final Map<String, dynamic> requestMap = request;
+          final Map<String, dynamic> senderDetails =
+              requestMap['sender'] as Map<String, dynamic>;
 
-        Map<String, dynamic>? senderDoc =
-            await AuthNetworking().getUserDocument(senderId);
-        final data = doc.data();
-        // todo parse senderDoc to AppUser
-        // data // todo update data with id and 'user': senderDoc
-        // meetingRequest.add(MeetingRequest.fromJson())
-        requests.add({
-          'request': {
-            ...requestData,
-            'id': doc.id,
-          },
-          'user': senderDoc,
-        });
-            }
+          // Add the request to the list
+          requests.add({
+            'request': {
+              ...requestMap, // Include all fields from the request
+              'id': requestMap['_id'], // Use '_id' as the request ID
+            },
+            'user': senderDetails,
+          });
+        }
+      }
 
+      // Return the list of requests
       return requests;
     } catch (error) {
-      print("Error fetching meeting requests: $error");
+      print("Error fetching requests: $error");
       throw error;
     }
   }
 
-  Future<void> acceptMeetingRequest(
-      String requestId, String senderId, String receiverId) async {
-    try {
-      await _firestore
-          .collection('meeting_requests')
-          .doc(requestId)
-          .update({'status': 'accepted'});
+  // Future<void> acceptMeetingRequest(
+  //     String requestId, String senderId, String receiverId) async {
+  //   try {
+  //     await _firestore
+  //         .collection('meeting_requests')
+  //         .doc(requestId)
+  //         .update({'status': 'accepted'});
+  //
+  //     await _firestore.collection('connections').add({
+  //       'accepted': receiverId,
+  //       'sent': senderId,
+  //       'date': Timestamp.now(),
+  //     });
+  //   } catch (e) {
+  //     print('Error accepting meeting request: $e');
+  //     throw e;
+  //   }
+  // }
+  //
+  // Future<void> rejectMeetingRequest(String requestId) async {
+  //   try {
+  //     await _firestore
+  //         .collection('meeting_requests')
+  //         .doc(requestId)
+  //         .update({'status': 'rejected'});
+  //   } catch (e) {
+  //     print('Error rejecting meeting request: $e');
+  //     throw e;
+  //   }
+  // }
 
-      await _firestore.collection('connections').add({
-        'accepted': receiverId,
-        'sent': senderId,
-        'date': Timestamp.now(),
+  Future<void> handleMeetingRequest({
+    required String requestId,
+    required String senderId,
+    required String receiverId,
+    required String action,
+  }) async {
+    try {
+      final dioInstance = DioClient.getDioInstance();
+      final url = ApiConstants.baseUrl + ApiConstants.handleConnectionRequests;
+
+      final response = await dioInstance.put(url, data: {
+        'requestId': requestId,
+        'action': action,
       });
-    } catch (e) {
-      print('Error accepting meeting request: $e');
-      throw e;
-    }
-  }
 
-  Future<void> rejectMeetingRequest(String requestId) async {
-    try {
-      await _firestore
-          .collection('meeting_requests')
-          .doc(requestId)
-          .update({'status': 'rejected'});
+      if (response.statusCode != 200) {
+        throw Exception(
+            "Failed to handle meeting request: ${response.statusCode}");
+      }
+
+      final Map<String, dynamic> responseData = response.data;
+      if (!responseData['success']) {
+        throw Exception(
+            responseData['message'] ?? "Failed to handle meeting request");
+      }
+
+      if (action == 'Approve') {
+        await _firestore.collection('connections').add({
+          'accepted': receiverId,
+          'sent': senderId,
+          'date': Timestamp.now(),
+        });
+      }
     } catch (e) {
-      print('Error rejecting meeting request: $e');
+      print("Error handling meeting request: $e");
       throw e;
     }
   }

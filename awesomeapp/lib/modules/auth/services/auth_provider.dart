@@ -214,4 +214,12 @@ class AuthenticationProvider with ChangeNotifier {
     }
     return null;
   }
+
+  void updateToken(String newToken){
+    if(_appUser != null ){
+      _appUser!.accessToken = newToken;
+      _hiveService.saveUser(_appUser!);
+      notifyListeners();
+    }
+  }
 }

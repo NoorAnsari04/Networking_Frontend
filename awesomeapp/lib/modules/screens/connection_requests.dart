@@ -55,28 +55,40 @@ class _ConnectionRequestsContentState extends State<ConnectionRequestsContent> {
             return Center(
               child: Text(
                 'No pending requests available.',
-                style: bodyMediumTextStyle,
+                // style: bodyMediumTextStyle,
               ),
             );
           }
+          if (provider.errorMessage != null) {}
           return ListView.builder(
             itemCount: provider.meetingRequests.length,
             itemBuilder: (context, index) {
               final request = provider.meetingRequests[index];
-              final user = AppUser.fromJson(request['user']);
-              final isSpeakerRequest =
-                  request['request']['meetingTitle'] == null ||
-                      request['request']['meetingTitle'].isEmpty;
+              final user = AppUser.fromJson(request['user'] ?? {});
+              final requestData =
+                  (request['request'] as Map<String, dynamic>) ?? {};
+              final isSpeakerRequest = requestData['meetingTitle'] == null ||
+                  requestData['meetingTitle'].isEmpty;
               return ConnectionRequestList(
-                user: user,
-                requestId: request['request']['id'],
-                sentUserId: request['request']['senderId'],
-                meetingTitle: request['request']['meetingTitle'] ?? '',
-                showApproveButton: true,
-                showDenyButton: true,
-                requestData: request['request'],
-                isSpeakerRequest: isSpeakerRequest,
-              );
+                  user: user,
+                  requestId: requestData['id'] ?? '',
+                  sentUserId: requestData['senderId'] ?? '',
+                  meetingTitle: requestData['meetingTitle'] ?? '',
+                  showApproveButton: true,
+                  showDenyButton: true,
+                  requestData: requestData,
+                  isSpeakerRequest: isSpeakerRequest,
+                  onAccept: () {
+                    // Optionally, you can trigger a refresh here
+                    provider.meetingRequests.removeWhere((request) =>
+                        request['request']['id'] == requestData['id']);
+                    provider.notifyListeners();
+                  },
+                  onReject: () {
+                    provider.meetingRequests.removeWhere((request) =>
+                    request['request']['id'] == requestData['id']);
+                    provider.notifyListeners();
+                  });
             },
           );
         },
