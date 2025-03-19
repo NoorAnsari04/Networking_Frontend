@@ -40,7 +40,7 @@ void submitForm(
       'linkedInUrl': formData.linkedinUrlController.text.isNotEmpty
           ? formData.linkedinUrlController.text
           : '',
-      'interests': formData.interests,
+      'interests': jsonEncode(formData.interests),
       'description': formData.descriptionController.text.isNotEmpty
           ? formData.descriptionController.text
           : '',

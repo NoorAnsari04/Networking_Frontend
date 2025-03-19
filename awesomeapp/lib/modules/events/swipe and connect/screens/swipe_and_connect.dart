@@ -7,6 +7,7 @@ import 'package:my_test_app_flavors/core/extensions/scaffold_message.dart';
 import 'package:provider/provider.dart';
 import 'package:my_test_app_flavors/core/constants/icon_constants.dart';
 import '../../../../core/services/helper_function.dart';
+import '../../services/event_model.dart';
 import '../components/attandee_card.dart';
 import '../../components/swipe_widget.dart';
 import '../components/background_connect_widget.dart';
@@ -15,6 +16,9 @@ import 'perferences_screen.dart';
 
 class SwipeAndConnectScreen extends StatefulWidget {
   static const id = 'swipeAndConnectScreen';
+  final EventModel event;
+
+  SwipeAndConnectScreen({required this.event});
 
   @override
   _SwipeAndConnectScreenState createState() => _SwipeAndConnectScreenState();
@@ -29,11 +33,17 @@ class _SwipeAndConnectScreenState extends State<SwipeAndConnectScreen> {
 
   bool isAccepting = false;
 
+  // Validate conferenceId
+  bool isValidConferenceId(String conferenceId) {
+    return conferenceId.length == 24 && RegExp(r'^[a-fA-F0-9]{24}$').hasMatch(conferenceId);
+  }
+
   @override
   void dispose() {
     offsetXNotifier.dispose();
     isInvitation.dispose();
     showSecondCard.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 
@@ -43,8 +53,16 @@ class _SwipeAndConnectScreenState extends State<SwipeAndConnectScreen> {
     _pageController = PageController(initialPage: 0, viewportFraction: 1);
     final provider =
         Provider.of<SwipeAndConnectProvider>(context, listen: false);
+
+    // Validate conferenceId before loading users
+    if (!isValidConferenceId(widget.event.eventId)) {
+      print("Invalid conferenceId: ${widget.event.eventId}");
+      return;
+    }
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      provider.loadUsers();
+      provider.loadUsers(widget.event.eventId,
+          profession: 'profession', industry: 'industry');
     });
   }
 
@@ -133,13 +151,18 @@ class _SwipeAndConnectScreenState extends State<SwipeAndConnectScreen> {
                                         opacity: offsetX.clamp(0.0, 1.0),
                                         color: _color.value,
                                         showSecondCard: showSecondCard.value,
+                                        conferenceId: widget.event.eventId,
                                       ),
                                     SwipeWidget(
                                       onChange: onDxChange,
                                       onActionPerformed: (vl) {
                                         if (vl > 200) {
-                                          provider.makeConnection(
-                                              provider.attendees[index].id);
+                                          provider.swipeAndConnectAction(
+                                              receiverId:
+                                                  provider.attendees[index].id,
+                                              action: true,
+                                              conferenceId:
+                                                  widget.event.eventId);
                                           if (provider.attendees[index]
                                               .isReceivedRequest) {
                                             HelperFunction.showToast(
@@ -149,8 +172,12 @@ class _SwipeAndConnectScreenState extends State<SwipeAndConnectScreen> {
                                                 .showSnackBar('Request sent');
                                           }
                                         } else if (vl < -200) {
-                                          provider.rejectUser(
-                                              provider.attendees[index].id);
+                                          provider.swipeAndConnectAction(
+                                              receiverId:
+                                                  provider.attendees[index].id,
+                                              action: false,
+                                              conferenceId:
+                                                  widget.event.eventId);
                                           context
                                               .showSnackBar('Rejected request');
                                         }
@@ -167,9 +194,11 @@ class _SwipeAndConnectScreenState extends State<SwipeAndConnectScreen> {
                                             lastName: provider
                                                 .attendees[index].lastName,
                                             isStudent: provider.attendees[index]
-                                                    .userType == 'Student',
+                                                    .userType ==
+                                                'Student',
                                             company: provider.attendees[index]
-                                                        .userType == 'Student'
+                                                        .userType ==
+                                                    'Student'
                                                 ? provider.attendees[index]
                                                         .instituteName ??
                                                     ''
@@ -177,7 +206,8 @@ class _SwipeAndConnectScreenState extends State<SwipeAndConnectScreen> {
                                                         .company ??
                                                     '',
                                             position: provider.attendees[index]
-                                                        .userType == 'Student'
+                                                        .userType ==
+                                                    'Student'
                                                 ? provider.attendees[index]
                                                         .degreeProgram ??
                                                     ''
@@ -192,14 +222,22 @@ class _SwipeAndConnectScreenState extends State<SwipeAndConnectScreen> {
                                                     .description ??
                                                 '',
                                             onSkip: () {
-                                              provider.rejectUser(
-                                                  provider.attendees[index].id);
+                                              provider.swipeAndConnectAction(
+                                                  receiverId: provider
+                                                      .attendees[index].id,
+                                                  action: false,
+                                                  conferenceId:
+                                                      widget.event.eventId);
                                               context.showSnackBar(
                                                   'Rejected request');
                                             },
                                             onConnect: () {
-                                              provider.makeConnection(
-                                                  provider.attendees[index].id);
+                                              provider.swipeAndConnectAction(
+                                                  receiverId: provider
+                                                      .attendees[index].id,
+                                                  action: true,
+                                                  conferenceId:
+                                                      widget.event.eventId);
                                               if (provider.attendees[index]
                                                   .isReceivedRequest) {
                                                 HelperFunction.showToast(

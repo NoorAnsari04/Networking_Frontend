@@ -23,15 +23,15 @@ import '../../modules/events/services/event_model.dart';
 class AppRoutes {
   static final rootNavigatorKey = GlobalKey<NavigatorState>();
   static final shellNavigatorAKey =
-      GlobalKey<NavigatorState>(debugLabel: 'shellA');
+  GlobalKey<NavigatorState>(debugLabel: 'shellA');
   static final shellNavigatorBKey =
-      GlobalKey<NavigatorState>(debugLabel: 'shellB');
+  GlobalKey<NavigatorState>(debugLabel: 'shellB');
   static final shellNavigatorCKey =
-      GlobalKey<NavigatorState>(debugLabel: 'shellC');
+  GlobalKey<NavigatorState>(debugLabel: 'shellC');
   static final shellNavigatorDKey =
-      GlobalKey<NavigatorState>(debugLabel: 'shellD');
+  GlobalKey<NavigatorState>(debugLabel: 'shellD');
   static final shellNavigatorEKey =
-      GlobalKey<NavigatorState>(debugLabel: 'shellE');
+  GlobalKey<NavigatorState>(debugLabel: 'shellE');
 
   static final router = GoRouter(
     initialLocation: '/${SignupScreen.id}',
@@ -43,7 +43,7 @@ class AppRoutes {
         builder: (context, state) => SignupScreen(),
         redirect: (context, state) {
           final authProv =
-              Provider.of<AuthenticationProvider>(context, listen: false);
+          Provider.of<AuthenticationProvider>(context, listen: false);
           return authProv.appUser != null ? '/${HomeScreen.id}' : null;
         },
       ),
@@ -52,9 +52,9 @@ class AppRoutes {
         name: UserDetailsScreen.id,
         builder: (context, state) {
           final Map<String, dynamic> extra =
-              state.extra as Map<String, dynamic>;
+          state.extra as Map<String, dynamic>;
           final Map<String, dynamic> signupData =
-              extra['signupData'] as Map<String, dynamic>;
+          extra['signupData'] as Map<String, dynamic>;
           final bool isGoogleSignIn = extra['isGoogleSignIn'] as bool? ?? false;
           return UserDetailsScreen(
               signupData: signupData, isGoogleSignIn: isGoogleSignIn);
@@ -94,7 +94,7 @@ class AppRoutes {
                 path: SpeakerProfile.id,
                 builder: (context, state) {
                   final speaker =
-                      (state.extra as Map<String, dynamic>)['speaker'];
+                  (state.extra as Map<String, dynamic>)['speaker'];
                   return SpeakerProfile(speaker: speaker);
                 },
               ),
@@ -103,7 +103,7 @@ class AppRoutes {
                 path: MeetingRequestScreen.id,
                 builder: (context, state) {
                   final speaker =
-                      (state.extra as Map<String, dynamic>)['speaker'];
+                  (state.extra as Map<String, dynamic>)['speaker'];
                   return MeetingRequestScreen(speaker: speaker);
                 },
               ),
@@ -114,7 +114,7 @@ class AppRoutes {
             name: TicketScreen.id,
             builder: (context, state) {
               final Map<String, dynamic> args =
-                  state.extra as Map<String, dynamic>;
+              state.extra as Map<String, dynamic>;
               final AppUser appUser = args['appUser'];
               final EventModel eventModel = args['eventModel'];
               return TicketScreen(
@@ -126,47 +126,58 @@ class AppRoutes {
           GoRoute(
             name: SwipeAndConnectScreen.id,
             path: SwipeAndConnectScreen.id,
-            builder: (context, state) => SwipeAndConnectScreen(),
+            builder: (context, state) {
+              final Map<String, dynamic> args =
+              state.extra as Map<String, dynamic>;
+              final EventModel event = args['event'];
+              return SwipeAndConnectScreen(
+                event: event,
+              );
+            },
             routes: [
-              GoRoute(
-                name: PreferencesScreen.id,
-                path: PreferencesScreen.id,
-                builder: (context, state) => PreferencesScreen(),
-              ),
-            ],
-          ),
-        ],
-      ),
-      GoRoute(
-        name: EditProfileScreen.id,
-        path: '/${EditProfileScreen.id}',
-        builder: (context, state) => EditProfileScreen(),
-      ),
-      GoRoute(
-        path: '/${ContactSupport.id}',
-        name: ContactSupport.id,
-        builder: (context, state) => ContactSupport(),
-      ),
-      StatefulShellRoute.indexedStack(
-        builder: (context, state, navigationShell) {
-          return NavigationScreen(
-            navigationShell: navigationShell,
-          );
-        },
-        branches: [
-          StatefulShellBranch(
-            navigatorKey: shellNavigatorAKey,
-            routes: [
-              GoRoute(
-                path: '/${HomeScreen.id}',
-                name: HomeScreen.id,
-                builder: (context, state) => HomeScreen(),
-                routes: [],
-              ),
-            ],
+            GoRoute(
+            name: PreferencesScreen.id,
+            path: PreferencesScreen.id,
+            builder: (context, state) => PreferencesScreen(),
           ),
         ],
       ),
     ],
+  ),
+      GoRoute
+
+  (
+
+  name: EditProfileScreen.id,
+  path: '/${EditProfileScreen.id}',
+  builder: (context, state) => EditProfileScreen(),
+  ),
+  GoRoute(
+  path: '/${ContactSupport.id}',
+  name: ContactSupport.id,
+  builder: (context, state) => ContactSupport(),
+  ),
+  StatefulShellRoute.indexedStack(
+  builder: (context, state, navigationShell) {
+  return NavigationScreen(
+  navigationShell: navigationShell,
+  );
+  },
+  branches: [
+  StatefulShellBranch(
+  navigatorKey: shellNavigatorAKey,
+  routes: [
+  GoRoute(
+  path: '/${HomeScreen.id}',
+  name: HomeScreen.id,
+  builder: (context, state) => HomeScreen(),
+  routes: [],
+  ),
+  ],
+  ),
+  ],
+  ),
+  ],
+
   );
 }

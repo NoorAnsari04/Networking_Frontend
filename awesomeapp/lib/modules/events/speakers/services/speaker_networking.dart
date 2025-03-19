@@ -82,6 +82,7 @@ class SpeakerNetworking {
       final url = ApiConstants.baseUrl + ApiConstants.pendingRequests;
       final dioInstance = DioClient.getDioInstance();
       final currentUserId = _auth.currentUser?.uid ?? '';
+      print("currentUserId: $currentUserId");
 
       // Make the API call
       final response = await dioInstance.get(url, queryParameters: {

@@ -10,13 +10,14 @@ class BackgroundConnectWidget extends StatelessWidget {
   final double opacity;
   final Color color;
   final bool showSecondCard;
-
+  final String conferenceId;
   const BackgroundConnectWidget({
     Key? key,
     required this.connect,
     required this.opacity,
     required this.color,
     required this.showSecondCard,
+    required this.conferenceId,
   }) : super(key: key);
 
   @override
@@ -41,12 +42,12 @@ class BackgroundConnectWidget extends StatelessWidget {
             onSkip: () {
               final provider =
                   Provider.of<SwipeAndConnectProvider>(context, listen: false);
-              provider.rejectUser(connect.id);
+              provider.swipeAndConnectAction(receiverId: connect.id, action: false,conferenceId: conferenceId );
             },
             onConnect: () {
               final provider =
                   Provider.of<SwipeAndConnectProvider>(context, listen: false);
-              provider.makeConnection(connect.id);
+              provider.swipeAndConnectAction(receiverId: connect.id, action: true, conferenceId: conferenceId);
             },
             showSecondCard: showSecondCard,
           ),

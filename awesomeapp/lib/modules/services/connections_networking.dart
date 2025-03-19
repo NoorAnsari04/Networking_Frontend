@@ -1,5 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:my_test_app_flavors/core/constants/api_constants.dart';
+import 'package:my_test_app_flavors/core/serviceLocator.dart';
+import 'package:my_test_app_flavors/modules/auth/services/auth_provider.dart';
+import '../../core/constants/dio_client.dart';
 import '../auth/services/app_user.dart';
 import '../auth/services/auth_networking.dart';
 
@@ -7,33 +12,157 @@ class ConnectionsNetworking {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
+  // Future<List<AppUser>> loadConnections() async {
+  //   final url = ApiConstants.baseUrl + ApiConstants.getConnections;
+  //   try {
+  //     // String currentUserId = _auth.currentUser?.uid ?? '';
+  //     //
+  //     // QuerySnapshot connectionsSnapshot = await _firestore
+  //     //     .collection('connections')
+  //     //     .where(Filter.or(Filter('accepted', isEqualTo: currentUserId),
+  //     //         Filter('sent', isEqualTo: currentUserId)))
+  //     //     .get();
+  //     //
+  //     // List<String> connectedUserIds = connectionsSnapshot.docs.map((doc) {
+  //     //   Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+  //     //   return data['accepted'] == currentUserId
+  //     //       ? data['sent'] as String
+  //     //       : data['accepted'] as String;
+  //     // }).toList()
+  //     String? token = serviceLocator<AuthenticationProvider>().authToken();
+  //     final dioInstance = DioClient.getDioInstance();
+  //     print(token);
+  //     final currentUserId = _auth.currentUser?.uid ?? '';
+  //     print("Current user ID: $currentUserId");
+  //
+  //     final response = await dioInstance.get(url,
+  //         options: Options(headers: {
+  //           "Authorization": "Bearer $token",
+  //         }));
+  //
+  //     if (response.statusCode == 200 && response.data != null) {
+  //       final Map<String, dynamic> responseData = response.data;
+  //       if (responseData['success'] == true) {
+  //         final List<dynamic> connections = responseData['data']['connections'];
+  //         print("Connections: $connections");
+  //
+  //         // List<String> connectedUserIds = connections.map((connection) {
+  //         //   return connection['sender'] == currentUserId
+  //         //       ? connection['receiver'] as String
+  //         //       : connection['sender'] as String;
+  //         // }).toList();
+  //
+  //         // print("Connected User IDs: $connectedUserIds");
+  //         //
+  //         // List<AppUser> connectionsList = await Future.wait(
+  //         //   connectedUserIds.map((userId) async {
+  //         //     Map<String, dynamic>? userDoc =
+  //         //         await AuthNetworking().getUserDocument(userId);
+  //         //     if (userDoc == null) {
+  //         //       throw Exception("User document not found for Id: $userId");
+  //         //     }
+  //         //     AppUser user = AppUser.fromJson(userDoc);
+  //         //     user.id = userId;
+  //         //     return user;
+  //         //   }),
+  //         // );
+  //         List<AppUser> connectionsList = [];
+  //         for (var connection in connections) {
+  //           if (connection['sender']['_id'] == currentUserId) {
+  //             final receiverId = connection['receiver'];
+  //             Map<String, dynamic>? receiverDoc =
+  //                 await AuthNetworking().getUserDocument(receiverId);
+  //             if (receiverDoc != null) {
+  //               AppUser receiverUser = AppUser.fromJson(receiverDoc);
+  //               receiverUser.id = receiverId;
+  //               connectionsList.add(receiverUser);
+  //             }
+  //           } else if (connection['receiver'] == currentUserId) {
+  //             final sender = connection['sender'];
+  //             AppUser senderUser = AppUser.fromJson(sender);
+  //             senderUser.id = sender['_id'];
+  //             connectionsList.add(senderUser);
+  //           }
+  //         }
+  //
+  //         print("Connections List: $connectionsList");
+  //         return connectionsList;
+  //       } else {
+  //         throw Exception(
+  //             "Failed to load connections: ${responseData['message']}");
+  //       }
+  //     } else {
+  //       throw Exception("Failed to load connections: ${response.statusCode}");
+  //     }
+  //   } catch (error) {
+  //     print("Error loading connections: $error");
+  //     throw Exception('Failed to load connections: $error');
+  //   }
+  // }
   Future<List<AppUser>> loadConnections() async {
     try {
-      String currentUserId = _auth.currentUser?.uid ?? '';
+      final url = ApiConstants.baseUrl + ApiConstants.getConnections;
+      final dioInstance = DioClient.getDioInstance();
+      final currentUserId = _auth.currentUser?.uid ?? '';
+      print("currentUserId: $currentUserId");
 
-      QuerySnapshot connectionsSnapshot = await _firestore
-          .collection('connections')
-          .where(Filter.or(Filter('accepted', isEqualTo: currentUserId),
-              Filter('sent', isEqualTo: currentUserId)))
-          .get();
+      // Make the API call
+      final response = await dioInstance.get(
+        url,
+        options: Options(headers: {
+          "Authorization":
+              "Bearer ${serviceLocator<AuthenticationProvider>().authToken()}",
+        }),
+      );
 
-      List<String> connectedUserIds = connectionsSnapshot.docs.map((doc) {
-        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-        return data['accepted'] == currentUserId
-            ? data['sent'] as String
-            : data['accepted'] as String;
-      }).toList();
+      // Check if the API call was successful
+      if (response.statusCode != 200) {
+        throw Exception("Failed to load connections: ${response.statusCode}");
+      }
 
-      List<AppUser> connections =
-          await Future.wait(connectedUserIds.map((userId) async {
-        Map<String, dynamic>? userDoc =
-            await AuthNetworking().getUserDocument(userId);
-        AppUser user = AppUser.fromJson(userDoc!);
-        user.id = userId;
-        return user;
-      }));
+      // Parse the response data
+      final Map<String, dynamic> responseData = response.data;
 
-      return connections;
+      // Check if the API returned any connections
+      if (!responseData['success'] ||
+          responseData['data']['connections'].isEmpty) {
+        throw Exception("No connections found");
+      }
+
+      // Get the list of connections
+      final List<dynamic> connections = responseData['data']['connections'];
+      List<AppUser> connectionsList = [];
+
+      // Loop through each connection
+      for (var connection in connections) {
+        // Ensure the connection is a Map<String, dynamic>
+        if (connection is Map<String, dynamic>) {
+          final Map<String, dynamic> connectionMap = connection;
+
+          // Check if the current user is the sender or receiver
+          if (connectionMap['sender']['_id'] == currentUserId) {
+            // Add the receiver's details
+            final receiverId = connectionMap['receiver'] as String;
+            Map<String, dynamic>? receiverDoc =
+                await AuthNetworking().getUserDocument(receiverId);
+            if (receiverDoc != null) {
+              AppUser receiverUser = AppUser.fromJson(receiverDoc);
+              receiverUser.id = receiverId;
+              connectionsList.add(receiverUser);
+            }
+          } else if (connectionMap['receiver'] == currentUserId) {
+            // Add the sender's details
+            final Map<String, dynamic> senderDetails =
+                connectionMap['sender'] as Map<String, dynamic>;
+            AppUser senderUser = AppUser.fromJson(senderDetails);
+            senderUser.id = senderDetails['_id'];
+            connectionsList.add(senderUser);
+          }
+        }
+      }
+
+      // Return the list of connections
+      return connectionsList;
     } catch (error) {
       print("Error loading connections: $error");
       throw error;

@@ -12,6 +12,7 @@ class ApiConstants {
   static const String socialSignup = '/api/auth/googleSignup';
   static const String pendingRequests = '/api/connect/pending-requests';
   static const String handleConnectionRequests = '/api/connect/handleConnectRequest';
+  static const String getConnections = '/api/connect/connections';
   static const int connectTimeout = 5000;
   static const int receiveTimeout = 3000;
 }

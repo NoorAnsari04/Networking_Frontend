@@ -56,9 +56,12 @@ class AppUser {
   bool isReceivedRequest;
 
   // New fields (not saved in Hive)
+  @HiveField(16)
   String? userType;
 
   List<String>? interests;
+
+  int score;
 
   AppUser({
     required this.id,
@@ -80,6 +83,7 @@ class AppUser {
     this.interests,
     this.accessToken,
     this.refreshToken,
+    this.score = 0,
   });
 
   factory AppUser.fromJson(Map<String, dynamic> jsonUser) {
@@ -104,8 +108,11 @@ class AppUser {
       interests: (jsonUser['interests'] as List<dynamic>?)?.cast<String>(),
       accessToken: jsonUser['accessToken'],
       refreshToken: jsonUser['refreshToken'],
+      score: jsonUser['score']?? 0,
     );
   }
+
+
 
   Map<String, dynamic> toJson() {
     return {
@@ -129,6 +136,7 @@ class AppUser {
       'interests': interests,
       'accessToken': accessToken,
       'refreshToken': refreshToken,
+      'score':'score',
     };
   }
 
@@ -159,6 +167,8 @@ class AppUser {
     List<String>? interests,
     String? accessToken,
     String? refreshToken,
+    int?score,
+
   }) {
     return AppUser(
       id: id ?? this.id,
@@ -180,6 +190,7 @@ class AppUser {
       interests: interests ?? this.interests,
       accessToken: accessToken ?? this.accessToken,
       refreshToken: refreshToken ?? this.refreshToken,
+      score: score ?? this.score,
     );
   }
 }

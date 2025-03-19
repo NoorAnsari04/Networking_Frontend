@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/font_constants.dart';
-import '../componenets/connection_tile.dart';
+import '../components/connection_tile.dart';
 import '../services/connections_provider.dart';
 
 class ConnectionsScreen extends StatelessWidget {
@@ -9,10 +9,7 @@ class ConnectionsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => ConnectionsProvider(),
-      child: _ConnectionsScreen(),
-    );
+    return _ConnectionsScreen();
   }
 }
 
@@ -43,6 +40,14 @@ class _ConnectionsScreen extends StatelessWidget {
         builder: (context, provider, _) {
           if (provider.isLoading) {
             return Center(child: CircularProgressIndicator());
+          }
+          if(provider.errorMessage != null){
+            return Center(
+              child: Text(
+                provider.errorMessage!,
+                style: TextStyle(color: Colors.red),
+              ),
+            );
           }
           if (provider.connections.isEmpty) {
             return Center(

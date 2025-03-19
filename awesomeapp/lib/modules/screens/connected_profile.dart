@@ -2,8 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:my_test_app_flavors/core/extensions/extension.dart';
-import 'package:my_test_app_flavors/modules/componenets/connection_card.dart';
-import 'package:my_test_app_flavors/modules/componenets/connection_card_details.dart';
+import 'package:my_test_app_flavors/modules/components/connection_card.dart';
+import 'package:my_test_app_flavors/modules/components/connection_card_details.dart';
 import '../../core/constants/color_constants.dart';
 import '../../core/constants/icon_constants.dart';
 import '../../core/shared/custum_appbar.dart';

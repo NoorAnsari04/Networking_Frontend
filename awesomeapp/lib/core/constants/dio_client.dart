@@ -7,6 +7,7 @@ class DioClient{
   static Dio getDioInstance(){
     final hiveService = HiveService();
     _dio.interceptors.add(Refreshtokeninterceptor(_dio, hiveService));
+    // _dio.interceptors.add(LogInterceptor(requestBody: true, responseBody: true));
     return _dio;
   }
 }

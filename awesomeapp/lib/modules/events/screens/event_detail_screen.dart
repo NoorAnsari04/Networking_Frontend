@@ -144,7 +144,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       top: 278.h,
                       left: 207.w,
                       onTap: () {
-                        context.pushNamed(SwipeAndConnectScreen.id);
+                        context.pushNamed(SwipeAndConnectScreen.id, extra: {
+                          'event': widget.event
+                        });
                       },
                     ),
                   ],

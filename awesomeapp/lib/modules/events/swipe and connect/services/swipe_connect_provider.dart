@@ -25,34 +25,59 @@ class SwipeAndConnectProvider with ChangeNotifier {
     super.dispose();
   }
 
-  Future<void> loadUsers() async {
+  Future<void> loadUsers(String conferenceId,
+      {String? profession, String? industry}) async {
     _isLoading = true;
     notifyListeners();
-
-    _attendees = await _networking.loadUsers();
-
+    try {
+      _attendees = await _networking.loadUsers(conferenceId,
+          profession: profession, industry: industry);
+    } catch (error) {
+      print("error loading users: $error");
+      _attendees = [];
+    }
     _isLoading = false;
     if (!_disposed) {
       notifyListeners();
     }
   }
 
-  Future<void> makeConnection(String receiverId) async {
-    await _networking.makeConnection(receiverId);
-    _attendees.removeAt(_currentIndex);
-    if (_currentIndex >= _attendees.length) {
-      _currentIndex = 0;
+  // Future<void> makeConnection(String receiverId) async {
+  //   await _networking.makeConnection(receiverId);
+  //   _attendees.removeAt(_currentIndex);
+  //   if (_currentIndex >= _attendees.length) {
+  //     _currentIndex = 0;
+  //   }
+  //   notifyListeners();
+  // }
+  //
+  // Future<void> rejectUser(String receiverId) async {
+  //   await _networking.rejectUser(receiverId);
+  //   _rejectedUsers.add(_attendees[_currentIndex]);
+  //   _attendees.removeAt(_currentIndex);
+  //   if (_currentIndex >= _attendees.length) {
+  //     _currentIndex = 0;
+  //   }
+  //   notifyListeners();
+  // }
+  Future<void> swipeAndConnectAction({
+    required String receiverId,
+    required bool action,
+    required String conferenceId,
+  }) async {
+    try {
+      await _networking.swipeAndConnectAction(
+          receiverId: receiverId, action: action, conferenceId: conferenceId);
+      if (action) {
+        _attendees.removeAt(_currentIndex);
+      } else {
+        _rejectedUsers.add(_attendees[_currentIndex]);
+        _attendees.removeAt(_currentIndex);
+      }
+      notifyListeners();
+    } catch (error) {
+      print("Error performing swipe action: $error");
+      throw error;
     }
-    notifyListeners();
-  }
-
-  Future<void> rejectUser(String receiverId) async {
-    await _networking.rejectUser(receiverId);
-    _rejectedUsers.add(_attendees[_currentIndex]);
-    _attendees.removeAt(_currentIndex);
-    if (_currentIndex >= _attendees.length) {
-      _currentIndex = 0;
-    }
-    notifyListeners();
   }
 }
