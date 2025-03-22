@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:my_test_app_flavors/core/extensions/extension.dart';
 import 'package:my_test_app_flavors/core/extensions/scaffold_message.dart';
 import 'package:my_test_app_flavors/modules/auth/screens/user_details_screen.dart';
+import 'package:my_test_app_flavors/modules/navigation/navigation_provider.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/font_constants.dart';
 import '../../../core/constants/icon_constants.dart';
@@ -65,7 +66,8 @@ class _LoginScreenState extends State<LoginScreen> {
           _rememberMe,
         );
         // context.showSnackBar('Login Successful');
-
+        // final navProvider = Provider.of<NavigationProvider>(context, listen: false);
+        // navProvider.resetTab();
         context.goNamed(
           HomeScreen.id,
         );

@@ -7,7 +7,9 @@ class NavigationProvider extends ChangeNotifier {
   bool isLoading = false;
   static GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-
+  NavigationProvider() {
+    controller = PageController(initialPage: 0);
+  }
 
   void changeTab(int newIndex) {
     if (this.currentTabIndex != newIndex) {
@@ -19,6 +21,8 @@ class NavigationProvider extends ChangeNotifier {
 
   void resetTab() {
     this.currentTabIndex = 0;
+    this.controller.jumpToPage(0);
+    notifyListeners();
   }
 
   updateLoading(bool val) {
@@ -26,7 +30,11 @@ class NavigationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void navigateToLogin(BuildContext context){
-    Navigator.pushAndRemoveUntil(context, CupertinoPageRoute(builder: (context) => LoginScreen()), (route) => false);
+  void navigateToLogin(BuildContext context) {
+    Navigator.pushAndRemoveUntil(
+        context,
+        CupertinoPageRoute(builder: (context) => LoginScreen()),
+        (route) => false);
+    resetTab();
   }
 }

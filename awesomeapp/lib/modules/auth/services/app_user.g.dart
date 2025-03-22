@@ -25,7 +25,7 @@ class AppUserAdapter extends TypeAdapter<AppUser> {
       company: fields[5] as String?,
       description: fields[8] as String?,
       imageUrl: fields[4] as String?,
-      yearOfExperience: fields[9] as String?,
+      yearsOfExperience: fields[9] as String?,
       linkedinUrl: fields[10] as String?,
       sessionsDeliver: fields[7] as String?,
       degreeProgram: fields[11] as String?,
@@ -57,7 +57,7 @@ class AppUserAdapter extends TypeAdapter<AppUser> {
       ..writeByte(8)
       ..write(obj.description)
       ..writeByte(9)
-      ..write(obj.yearOfExperience)
+      ..write(obj.yearsOfExperience)
       ..writeByte(10)
       ..write(obj.linkedinUrl)
       ..writeByte(11)

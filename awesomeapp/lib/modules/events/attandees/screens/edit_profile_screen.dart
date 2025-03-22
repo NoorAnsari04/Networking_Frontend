@@ -78,7 +78,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       _positionController =
           TextEditingController(text: _authProvider.appUser!.position);
       _experienceController =
-          TextEditingController(text: _authProvider.appUser!.yearOfExperience ?? '');
+          TextEditingController(text: _authProvider.appUser!.yearsOfExperience ?? '');
     }
 
     _imageUrl = _authProvider.appUser!.imageUrl;
@@ -158,8 +158,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           instituteName: _isStudent ? _instituteNameController.text : null,
           company: _isStudent ? null : _companyController.text,
           position: _isStudent ? null : _positionController.text,
-          yearOfExperience: _isStudent ? null : _experienceController.text,
-          sessionsDeliver:_authProvider.appUser!.sessionsDeliver
+          yearsOfExperience: _isStudent ? null : _experienceController.text,
+          sessionsDeliver:_authProvider.appUser!.sessionsDeliver,
+          accessToken: _authProvider.appUser!.accessToken,
         );
 
         _authProvider.updateUser(updatedUser);

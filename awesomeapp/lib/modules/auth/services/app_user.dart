@@ -33,7 +33,7 @@ class AppUser {
   String? description;
 
   @HiveField(9)
-  String? yearOfExperience;
+  String? yearsOfExperience;
 
   @HiveField(10)
   String? linkedinUrl;
@@ -72,7 +72,7 @@ class AppUser {
     required this.company,
     required this.description,
     required this.imageUrl,
-    required this.yearOfExperience,
+    required this.yearsOfExperience,
     required this.linkedinUrl,
     required this.sessionsDeliver,
     this.isReceivedRequest = false,
@@ -98,7 +98,7 @@ class AppUser {
       description: jsonUser['description'],
       imageUrl: jsonUser['imageUrl'],
       sessionsDeliver: jsonUser['sessionsDeliver'],
-      yearOfExperience: jsonUser['yearOfExperience'],
+      yearsOfExperience: jsonUser['yearsOfExperience'],
       linkedinUrl: jsonUser['linkedInUrl'],
       isReceivedRequest: jsonUser['isReceivedRequest'] ?? false,
       userType: jsonUser['userType'],
@@ -126,7 +126,7 @@ class AppUser {
       'description': description,
       'imageUrl': imageUrl,
       'sessionsDeliver': sessionsDeliver,
-      'yearOfExperience': yearOfExperience,
+      'yearsOfExperience': yearsOfExperience,
       'linkedInUrl': linkedinUrl,
       'isReceivedRequest': isReceivedRequest,
       'userType': userType,
@@ -157,7 +157,7 @@ class AppUser {
     String? position,
     String? sessionsDeliver,
     String? description,
-    String? experience,
+    String? yearsOfExperience,
     String? linkedinUrl,
     bool? isReceivedRequest,
     String? userType,
@@ -180,7 +180,7 @@ class AppUser {
       position: position ?? this.position,
       sessionsDeliver: sessionsDeliver ?? this.sessionsDeliver,
       description: description ?? this.description,
-      yearOfExperience: experience ?? this.yearOfExperience,
+      yearsOfExperience: yearsOfExperience ?? this.yearsOfExperience,
       linkedinUrl: linkedinUrl ?? this.linkedinUrl,
       isReceivedRequest: isReceivedRequest ?? this.isReceivedRequest,
       userType: userType ?? this.userType,

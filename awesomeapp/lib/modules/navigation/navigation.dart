@@ -43,13 +43,14 @@ class _NavigationScreenState extends State<NavigationScreen> {
 
     this._navigationProvider.controller = PageController(initialPage: 0);
 
-    tabs.add(HomeScreen(
-      changeBottomNavBarTab: this._navigationProvider.changeTab,
-    ));
-
-    tabs.add(ConnectionRequestsScreen());
-    tabs.add(ConnectionsScreen()); // Add the ConnectionsScreen
-    tabs.add(ProfileScreen());
+    tabs = [
+      HomeScreen(
+        changeBottomNavBarTab: this._navigationProvider.changeTab,
+      ),
+      ConnectionRequestsScreen(),
+      ConnectionsScreen(),
+      ProfileScreen(),
+    ];
   }
 
   @override
@@ -64,6 +65,9 @@ class _NavigationScreenState extends State<NavigationScreen> {
                 children: tabs,
                 physics: NeverScrollableScrollPhysics(),
                 controller: navProv.controller,
+                onPageChanged: (index) {
+                  navProv.changeTab(index);
+                },
               );
             }),
             bottomNavigationBar:
@@ -75,30 +79,51 @@ class _NavigationScreenState extends State<NavigationScreen> {
                 showUnselectedLabels: false,
                 backgroundColor: Colors.white,
                 elevation: 0,
-                onTap: this._navigationProvider.changeTab,
+                onTap: (index) {
+                  navProv.changeTab(index);
+                  navProv.controller.jumpToPage(index);
+                },
                 items: [
                   BottomNavigationBarItem(
                     icon: Icon(Icons.home),
+                    activeIcon: Icon(Icons.home, color: Colors.deepPurple),
                     label: "",
                   ),
                   BottomNavigationBarItem(
                     icon: SvgPicture.asset(
-                      IconConstants.requestIcon,
-                      height: 20.h,
-                      width: 20.w,
-                    ),
+                        navProv.currentTabIndex == 1
+                            ? IconConstants.filledRequestIcon
+                            : IconConstants.requestIcon,
+                        height: 20.h,
+                        width: 20.w,
+                        colorFilter: ColorFilter.mode(
+                            navProv.currentTabIndex == 1
+                                ? Colors.deepPurple
+                                : Colors.black,
+                            BlendMode.srcIn)
+                        // color: Colors.grey,
+                        ),
                     label: "",
                   ),
                   BottomNavigationBarItem(
                     icon: SvgPicture.asset(
-                      IconConstants.connectionIcon,
-                      height: 18.h,
-                      width: 20.w,
-                    ),
+                        navProv.currentTabIndex == 2
+                            ? IconConstants.filledConnectionsIcon
+                            : IconConstants.connectionIcon,
+                        height: 18.h,
+                        width: 20.w,
+                        colorFilter: ColorFilter.mode(
+                            navProv.currentTabIndex == 2
+                                ? Colors.deepPurple
+                                : Colors.black,
+                            BlendMode.srcIn)
+                        // color: Colors.blue,
+                        ),
                     label: "",
                   ),
                   BottomNavigationBarItem(
                     icon: Icon(Icons.person),
+                    activeIcon: Icon(Icons.person, color: Colors.deepPurple),
                     label: "",
                   ),
                 ],

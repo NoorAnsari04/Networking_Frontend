@@ -61,7 +61,7 @@ class AuthNetworking {
           print("the user is null");
         }
       } else {
-        print('Unexpectes status code: ${response.statusCode}');
+        print('Unexpected status code: ${response.statusCode}');
       }
     } catch (e) {
       print('Signup API Error: $e');

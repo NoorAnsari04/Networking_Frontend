@@ -31,7 +31,7 @@ void submitForm(
       'company': formData.companyController.text.isNotEmpty
           ? formData.companyController.text
           : '',
-      'yearOfExperience': formData.experienceController.text.isNotEmpty
+      'yearsOfExperience': formData.experienceController.text.isNotEmpty
           ? formData.experienceController.text
           : '',
       'designation': formData.positionController.text.isNotEmpty
@@ -73,6 +73,11 @@ void submitForm(
 
         final Map<String, dynamic> userData = response.data['data']['user'] ?? {};
         userData['accessToken'] = response.data['data']['accessToken'] ?? token;
+        if (userData.containsKey('interests') && userData['interests'] is List) {
+          userData['interests'] = (userData['interests'] as List)
+              .map((e) => e is Map<String, dynamic> ? e['name'] : e)
+              .toList();
+        }
         authProvider.updateUser(AppUser.fromJson(userData));
         // userData.addAll(response.data['data']['user']);
 

@@ -12,7 +12,7 @@ class IconConstants {
   static String titleIcon = 'assets/title.svg';
   static String arrowIcon = 'assets/backward_arrow_head.svg';
   static String connectionIcon = 'assets/connections.svg';
-  static String requestIcon = 'assets/request.svg';
+  static String requestIcon = 'assets/req_icon.svg';
   static String degreeIcon = 'assets/degree.svg';
   static String universityIcon = 'assets/university.svg';
   static String companyIcon = 'assets/company_bg.svg';
@@ -21,4 +21,8 @@ class IconConstants {
   static String approvedIcon = 'assets/approvedRequest.svg';
   static String meetingIcon = 'assets/MeetingRequest.svg';
   static String connectionsIcon = 'assets/connectionRequest.svg';
+  static String filledRequestIcon = 'assets/filled_req_icon.svg';
+  static String filledConnectionsIcon = 'assets/connections_filled.svg';
+  static String homeIcon = 'assets/home_outline2.svg';
+  static String filledHomeIcon = 'assets/filled_home.svg';
 }
