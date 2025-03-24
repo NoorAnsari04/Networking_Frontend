@@ -31,13 +31,13 @@ class ConnectionCardDetails extends StatelessWidget {
                   SizedBox(width: 8.w),
                   InkWell(
                     onTap: () {
-                      if (user.linkedinUrl != null) {
-                        HelperFunction.goToWebPage(user.linkedinUrl!);
+                      if (user.linkedInUrl != null) {
+                        HelperFunction.goToWebPage(user.linkedInUrl!);
                       }
                     },
                     child: Text(
-                      user.linkedinUrl != null
-                          ? Uri.parse(user.linkedinUrl!).host ?? ''
+                      user.linkedInUrl != null
+                          ? Uri.parse(user.linkedInUrl!).host
                           : '',
                       style: ktopTextStyle.copyWith(
                         fontSize: 12,

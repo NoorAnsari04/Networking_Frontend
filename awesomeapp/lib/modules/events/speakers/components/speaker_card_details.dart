@@ -171,7 +171,7 @@ class SpeakerCardDetails extends StatelessWidget {
             ),
             InkWell(
               onTap: () {
-                HelperFunction.goToWebPage(speaker.linkedinUrl!);
+                HelperFunction.goToWebPage(speaker.linkedInUrl!);
               },
               child: Text(shortLinkedInUrl),
             ),

@@ -63,7 +63,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _descriptionController =
         TextEditingController(text: _authProvider.appUser!.description);
     _linkedinController =
-        TextEditingController(text: _authProvider.appUser!.linkedinUrl ?? '');
+        TextEditingController(text: _authProvider.appUser!.linkedInUrl ?? '');
 
     if (_isStudent) {
       _degreeProgramController =
@@ -150,7 +150,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           lastName: lastName,
           email: _emailController.text,
           description: _descriptionController.text,
-          linkedinUrl: _linkedinController.text,
+          linkedInUrl: _linkedinController.text,
           imageUrl: imageUrl,
           userType: _isStudent ? 'Student' : 'Industry Person',
           degreeProgram: _isStudent ? _degreeProgramController.text : null,

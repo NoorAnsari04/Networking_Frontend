@@ -21,7 +21,7 @@ class _SpeakerProfileState extends State<SpeakerProfile> {
   @override
   void initState() {
     super.initState();
-    getShortLink(widget.speaker.linkedinUrl);
+    getShortLink(widget.speaker.linkedInUrl);
   }
 
   Future<void> getShortLink(String? url) async {

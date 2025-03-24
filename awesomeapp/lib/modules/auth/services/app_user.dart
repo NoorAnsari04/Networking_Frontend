@@ -36,7 +36,7 @@ class AppUser {
   String? yearsOfExperience;
 
   @HiveField(10)
-  String? linkedinUrl;
+  String? linkedInUrl;
 
   @HiveField(11)
   String? degreeProgram;
@@ -73,7 +73,7 @@ class AppUser {
     required this.description,
     required this.imageUrl,
     required this.yearsOfExperience,
-    required this.linkedinUrl,
+    required this.linkedInUrl,
     required this.sessionsDeliver,
     this.isReceivedRequest = false,
     this.userType,
@@ -99,7 +99,7 @@ class AppUser {
       imageUrl: jsonUser['imageUrl'],
       sessionsDeliver: jsonUser['sessionsDeliver'],
       yearsOfExperience: jsonUser['yearsOfExperience'],
-      linkedinUrl: jsonUser['linkedInUrl'],
+      linkedInUrl: jsonUser['linkedInUrl'],
       isReceivedRequest: jsonUser['isReceivedRequest'] ?? false,
       userType: jsonUser['userType'],
       degreeProgram: jsonUser['degreeProgram'],
@@ -127,7 +127,7 @@ class AppUser {
       'imageUrl': imageUrl,
       'sessionsDeliver': sessionsDeliver,
       'yearsOfExperience': yearsOfExperience,
-      'linkedInUrl': linkedinUrl,
+      'linkedInUrl': linkedInUrl,
       'isReceivedRequest': isReceivedRequest,
       'userType': userType,
       'degreeProgram': degreeProgram,
@@ -181,7 +181,7 @@ class AppUser {
       sessionsDeliver: sessionsDeliver ?? this.sessionsDeliver,
       description: description ?? this.description,
       yearsOfExperience: yearsOfExperience ?? this.yearsOfExperience,
-      linkedinUrl: linkedinUrl ?? this.linkedinUrl,
+      linkedInUrl: linkedinUrl ?? this.linkedInUrl,
       isReceivedRequest: isReceivedRequest ?? this.isReceivedRequest,
       userType: userType ?? this.userType,
       degreeProgram: degreeProgram ?? this.degreeProgram,

@@ -1,8 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image/image.dart';
 import 'package:my_test_app_flavors/core/constants/api_constants.dart';
 import 'package:my_test_app_flavors/core/serviceLocator.dart';
+import 'package:my_test_app_flavors/core/services/hive_services.dart';
+import 'package:my_test_app_flavors/main.dart';
 import 'package:my_test_app_flavors/modules/auth/services/auth_provider.dart';
 import '../../core/constants/dio_client.dart';
 import '../auth/services/app_user.dart';
@@ -103,7 +106,8 @@ class ConnectionsNetworking {
     try {
       final url = ApiConstants.baseUrl + ApiConstants.getConnections;
       final dioInstance = DioClient.getDioInstance();
-      final currentUserId = _auth.currentUser?.uid ?? '';
+      final appUser = HiveService().getUser();
+      final currentUserId = appUser?.id ?? '';
       print("currentUserId: $currentUserId");
 
       // Make the API call
@@ -114,7 +118,7 @@ class ConnectionsNetworking {
               "Bearer ${serviceLocator<AuthenticationProvider>().authToken()}",
         }),
       );
-
+      print("API response: ${response.data}");
       // Check if the API call was successful
       if (response.statusCode != 200) {
         throw Exception("Failed to load connections: ${response.statusCode}");
@@ -124,47 +128,63 @@ class ConnectionsNetworking {
       final Map<String, dynamic> responseData = response.data;
 
       // Check if the API returned any connections
-      if (!responseData['success'] ||
-          responseData['data']['connections'].isEmpty) {
-        throw Exception("No connections found");
+      if (!responseData['success']) {
+        print("DEBUG: API returned success=false");
+        return [];
+      }
+
+      if (responseData['data'] == null ||
+          responseData['data']['connections'] == null ||
+          (responseData['data']['connections'] as List).isEmpty) {
+        print("DEBUG: No connections found in API response");
+        return [];
       }
 
       // Get the list of connections
       final List<dynamic> connections = responseData['data']['connections'];
+      print("DEBUG: Found ${connections.length} connections in API response");
+
       List<AppUser> connectionsList = [];
 
       // Loop through each connection
       for (var connection in connections) {
-        // Ensure the connection is a Map<String, dynamic>
         if (connection is Map<String, dynamic>) {
-          final Map<String, dynamic> connectionMap = connection;
+          final Map<String, dynamic> senderDetails = connection['sender'] as Map<String, dynamic>;
+          final String senderId = senderDetails['_id'] as String;
+          final String receiverId = connection['receiver'] as String;
 
-          // Check if the current user is the sender or receiver
-          if (connectionMap['sender']['_id'] == currentUserId) {
-            // Add the receiver's details
-            final receiverId = connectionMap['receiver'] as String;
-            Map<String, dynamic>? receiverDoc =
-                await AuthNetworking().getUserDocument(receiverId);
-            if (receiverDoc != null) {
+          print("DEBUG: Connection - senderId: $senderId, receiverId: $receiverId");
+          print("DEBUG: Comparing with currentUserId: $currentUserId");
+
+          if (senderId == currentUserId) {
+            // Current user is the sender, add receiver
+            print("DEBUG: Current user is the sender, fetching receiver details");
+            Map<String, dynamic>? receiverDoc = await AuthNetworking().getUserDocument(receiverId);
+            if(receiverDoc != null){
               AppUser receiverUser = AppUser.fromJson(receiverDoc);
               receiverUser.id = receiverId;
               connectionsList.add(receiverUser);
+              print("DEBUG: Added receiver to connections list");
+            } else {
+              print("DEBUG: Receiver document is null for ID: $receiverId");
             }
-          } else if (connectionMap['receiver'] == currentUserId) {
-            // Add the sender's details
-            final Map<String, dynamic> senderDetails =
-                connectionMap['sender'] as Map<String, dynamic>;
+          } else if (receiverId == currentUserId) {
+            // Current user is the receiver, add sender
+            print("DEBUG: Current user is the receiver, adding sender");
             AppUser senderUser = AppUser.fromJson(senderDetails);
-            senderUser.id = senderDetails['_id'];
+            senderUser.id = senderId;
             connectionsList.add(senderUser);
+            print("DEBUG: Added sender to connections list");
+          } else {
+            print("DEBUG: Current user ($currentUserId) is neither sender ($senderId) nor receiver ($receiverId)");
           }
         }
       }
 
-      // Return the list of connections
+      print("DEBUG: Final connections list size: ${connectionsList.length}");
       return connectionsList;
     } catch (error) {
-      print("Error loading connections: $error");
+      print("DEBUG: Error loading connections: $error");
       throw error;
     }
   }
