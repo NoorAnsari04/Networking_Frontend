@@ -17,9 +17,11 @@ class EventDetailScreen extends StatefulWidget {
   final EventModel event;
   final AppUser appUser;
 
-  const EventDetailScreen(
-      {Key? key, required this.event, required this.appUser})
-      : super(key: key);
+  const EventDetailScreen({
+    Key? key,
+    required this.event,
+    required this.appUser,
+  }) : super(key: key);
 
   @override
   State<EventDetailScreen> createState() => _EventDetailScreenState();
@@ -29,29 +31,34 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.only(top: 40.h, left: 16.w, right: 16.w),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: SafeArea(
-                  child: Text(
-                    widget.event.title,
-                    style: TextStyle(fontSize: 28.sp),
-                  ),
+      body: Column(
+        children: [
+          // Top Section with Event Title
+          Padding(
+            padding: EdgeInsets.only(top: 40.h, left: 16.w, right: 16.w),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: SafeArea(
+                child: Text(
+                  widget.event.title,
+                  style: TextStyle(fontSize: 28.sp),
                 ),
               ),
             ),
-            EventImageWidget(event: widget.event),
-            Padding(
+          ),
+
+          // Event Image
+          EventImageWidget(event: widget.event),
+
+          // Grid Items Section
+          Expanded(
+            child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.w),
               child: Container(
                 width: double.infinity,
-                height: 600.h,
                 child: Stack(
                   children: [
+                    // Grid Items
                     GridItems(
                       title: 'Your Ticket',
                       backgroundImagePath: 'assets/tickets.png',
@@ -63,27 +70,31 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         final ticketProvider =
                             Provider.of<TicketProvider>(context, listen: false);
                         showDialog(
-                            context: context,
-                            barrierDismissible: false,
-                            builder: (context) => Center(
-                                  child: CircularProgressIndicator(),
-                                ));
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (context) => Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        );
                         try {
                           await ticketProvider
                               .fetchTicketDetails(widget.event.eventId);
                           Navigator.pop(context);
                           Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => TicketScreen(
-                                      appUser: widget.appUser,
-                                      eventModel: widget.event,
-                                      ticketDetails:
-                                          ticketProvider.ticketDetails)));
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TicketScreen(
+                                appUser: widget.appUser,
+                                eventModel: widget.event,
+                                ticketDetails: ticketProvider.ticketDetails,
+                              ),
+                            ),
+                          );
                         } catch (e) {
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Failed to load ticket")));
+                            SnackBar(content: Text("Failed to load ticket")),
+                          );
                         }
                       },
                     ),
@@ -105,8 +116,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       left: 0.w,
                       onTap: () async {
                         final speakerProvider = Provider.of<SpeakerProvider>(
-                            context,
-                            listen: false);
+                          context,
+                          listen: false,
+                        );
                         try {
                           await speakerProvider
                               .fetchSpeakers(widget.event.eventId);
@@ -144,17 +156,18 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       top: 278.h,
                       left: 207.w,
                       onTap: () {
-                        context.pushNamed(SwipeAndConnectScreen.id, extra: {
-                          'event': widget.event
-                        });
+                        context.pushNamed(
+                          SwipeAndConnectScreen.id,
+                          extra: {'event': widget.event},
+                        );
                       },
                     ),
                   ],
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
