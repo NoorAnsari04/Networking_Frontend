@@ -2,20 +2,61 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:get/get.dart';
 import 'package:my_test_app_flavors/core/constants/api_constants.dart';
 import 'package:my_test_app_flavors/core/serviceLocator.dart';
 import 'package:my_test_app_flavors/modules/auth/services/app_user.dart';
-import 'package:my_test_app_flavors/modules/auth/services/auth_networking.dart';
 import 'package:my_test_app_flavors/modules/auth/services/auth_provider.dart';
 import '../../../../core/constants/dio_client.dart';
-import 'connection_request_model.dart';
 import 'package:dio/dio.dart';
 
 class SwipeAndConnectNetworking {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final dioInstance = DioClient.getDioInstance();
+
+  Future<Map<String, String>> loadInterests() async {
+    final url = ApiConstants.baseUrl + ApiConstants.loadInterests;
+    try {
+      final response = await dioInstance.get(url);
+      if (response.statusCode == 200) {
+        return Map<String, String>.from(response.data);
+      }
+      throw Exception("Failed to load interests");
+    } catch (error) {
+      print("Error loading interests: $error");
+      throw error;
+    }
+  }
+
+  // Fix the fetchInterestNames method to match the API requirements
+  Future<Map<String, String>> fetchInterestNames(List<String> interestIds) async {
+    if (interestIds.isEmpty) {
+      return {};
+    }
+    final url = ApiConstants.baseUrl + ApiConstants.fetchInterestName;
+    try {
+      print("Fetching interest names for ${interestIds.length} IDs: $interestIds");
+
+      final response = await dioInstance.get(
+        url,
+        data: {
+          'interestIds': interestIds
+        }
+      );
+
+      if (response.statusCode == 200) {
+        print("Successfully fetched interest names: ${response.data}");
+        return Map<String, String>.from(response.data);
+      } else {
+        print(
+            "Failed to load interest names: ${response.statusCode} - ${response.statusMessage}");
+        return {};
+      }
+    } catch (error) {
+      print('Error fetching interest names: $error');
+      return {};
+    }
+  }
 
   Future<List<AppUser>> loadUsers(String conferenceId,
       {String? profession, String? industry}) async {
@@ -29,17 +70,61 @@ class SwipeAndConnectNetworking {
       print("Loading users for current user ID: $currentUserId");
 
       final response = await dioInstance.get(url, queryParameters: {
-        // 'conferenceId': conferenceId,
         'profession': profession,
         'industry': industry,
       });
 
       if (response.statusCode == 200) {
         final data = response.data;
-        List<AppUser> attendees = (data['data']['users'] as List)
-            .map((user) => AppUser.fromJson(user))
-            .toList();
-        attendees.removeWhere((x) => x.id == currentUserId);
+        List<AppUser> attendees = [];
+        if (data != null &&
+            data['data'] != null &&
+            data['data']['users'] != null) {
+          attendees = (data['data']['users'] as List)
+              .map((user) => AppUser.fromJson(user))
+              .toList();
+          attendees.removeWhere((x) => x.id == currentUserId);
+
+          if (attendees.isNotEmpty) {
+            Set<String> allInterestIds = {};
+            for (var user in attendees) {
+              if (user.interests != null && user.interests!.isNotEmpty) {
+                allInterestIds.addAll(user.interests!);
+              }
+            }
+            if (allInterestIds.isNotEmpty) {
+              try {
+                // Fetch all interest names in one call
+                Map<String, String> interestMap = await fetchInterestNames(allInterestIds.toList());
+
+                // Assign interest names to each user
+                for (var user in attendees) {
+                  if (user.interests != null && user.interests!.isNotEmpty) {
+                    user.interestNames = user.interests!
+                        .map((id) => interestMap[id] ?? 'Interest: $id')
+                        .toList();
+                  } else {
+                    user.interestNames = [];
+                  }
+                }
+              } catch (e) {
+                print("Error mapping interests: $e");
+                // Set default interest names if mapping fails
+                for (var user in attendees) {
+                  if (user.interests != null) {
+                    user.interestNames = user.interests!.map((id) => 'Interest: $id').toList();
+                  } else {
+                    user.interestNames = [];
+                  }
+                }
+              }
+            }
+          }
+        } else {
+          print("Unexpected API response structure: $data");
+        }
+
+        // Calculate score and sort users
         attendees.forEach((user) {
           user.score = calculateUserScore(user, profession, industry);
         });

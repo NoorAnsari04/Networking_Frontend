@@ -60,6 +60,7 @@ class AppUser {
   String? userType;
 
   List<String>? interests;
+  List<String>? interestNames;
 
   int score;
 
@@ -81,6 +82,7 @@ class AppUser {
     required this.yearOfGraduation,
     required this.instituteName,
     this.interests,
+    this.interestNames,
     this.accessToken,
     this.refreshToken,
     this.score = 0,
@@ -106,6 +108,7 @@ class AppUser {
       yearOfGraduation: jsonUser['yearOfGraduation'],
       instituteName: jsonUser['instituteName'],
       interests: (jsonUser['interests'] as List<dynamic>?)?.cast<String>(),
+      interestNames: [],
       accessToken: jsonUser['accessToken'],
       refreshToken: jsonUser['refreshToken'],
       score: jsonUser['score']?? 0,

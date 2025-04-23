@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:my_test_app_flavors/core/constants/dio_client.dart';
 import 'package:my_test_app_flavors/core/serviceLocator.dart';
 import 'package:my_test_app_flavors/modules/auth/services/app_user.dart';
-import 'package:my_test_app_flavors/modules/auth/services/auth_networking.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:my_test_app_flavors/modules/auth/services/auth_provider.dart';
 import '../../../../core/constants/api_constants.dart';

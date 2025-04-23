@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:my_test_app_flavors/modules/events/speakers/components/speaker_listTile.dart';
 import 'package:provider/provider.dart';
-import '../../../../core/constants/font_constants.dart';
 import '../../../../core/constants/icon_constants.dart';
 import '../../../../core/shared/custum_appbar.dart';
 import '../../../auth/services/app_user.dart';

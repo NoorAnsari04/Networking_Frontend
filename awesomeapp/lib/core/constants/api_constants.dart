@@ -1,5 +1,5 @@
 class ApiConstants {
-  static const String baseUrl = 'http://192.168.0.106:3000';
+  static const String baseUrl = 'http://192.168.100.29:3000';
   static const String login = '/api/auth/login/';
   static const String signUp = '/api/auth/signup/';
   static const String userDetails = '/api/user/update';
@@ -14,6 +14,8 @@ class ApiConstants {
   static const String handleConnectionRequests = '/api/connect/handleConnectRequest';
   static const String getConnections = '/api/connect/connections';
   static const String checkUserSpeaker = '/api/conference/:conferenceId/is-Speaker';
+  static const String loadInterests = '/api/interest/all';
+  static const String fetchInterestName = '/api/interest/name';
   static const int connectTimeout = 5000;
   static const int receiveTimeout = 3000;
 }

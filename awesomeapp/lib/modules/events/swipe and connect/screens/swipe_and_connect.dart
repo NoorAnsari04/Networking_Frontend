@@ -7,6 +7,7 @@ import 'package:my_test_app_flavors/core/extensions/scaffold_message.dart';
 import 'package:provider/provider.dart';
 import 'package:my_test_app_flavors/core/constants/icon_constants.dart';
 import '../../../../core/services/helper_function.dart';
+import '../../../auth/services/app_user.dart';
 import '../../services/event_model.dart';
 import '../components/attandee_card.dart';
 import '../../components/swipe_widget.dart';
@@ -35,7 +36,8 @@ class _SwipeAndConnectScreenState extends State<SwipeAndConnectScreen> {
 
   // Validate conferenceId
   bool isValidConferenceId(String conferenceId) {
-    return conferenceId.length == 24 && RegExp(r'^[a-fA-F0-9]{24}$').hasMatch(conferenceId);
+    return conferenceId.length == 24 &&
+        RegExp(r'^[a-fA-F0-9]{24}$').hasMatch(conferenceId);
   }
 
   @override
@@ -46,6 +48,8 @@ class _SwipeAndConnectScreenState extends State<SwipeAndConnectScreen> {
     _pageController.dispose();
     super.dispose();
   }
+
+  bool _isLoadingInterests = false;
 
   @override
   void initState() {
@@ -60,9 +64,21 @@ class _SwipeAndConnectScreenState extends State<SwipeAndConnectScreen> {
       return;
     }
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      provider.loadUsers(widget.event.eventId,
-          profession: 'profession', industry: 'industry');
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // provider.loadUsers(widget.event.eventId,
+      //     profession: 'profession', industry: 'industry');
+      // Also load interests if not already loaded
+      setState(() => _isLoadingInterests = true);
+      try {
+        await provider.loadInterests();
+        await provider.loadUsers(widget.event.eventId,
+            profession: 'profession', industry: 'industry');
+        print("Finished loading interests and users");
+      } catch (e) {
+        print("Error in initialization: $e");
+      } finally {
+        setState(() => _isLoadingInterests = false);
+      }
     });
   }
 
@@ -79,6 +95,22 @@ class _SwipeAndConnectScreenState extends State<SwipeAndConnectScreen> {
     }
   }
 
+  List<String> getInterestNames(AppUser user) {
+    if (user.interestNames != null && user.interestNames!.isNotEmpty) {
+      return user.interestNames!;
+    }
+
+    if (user.interests != null && user.interests!.isNotEmpty) {
+      final provider =
+          Provider.of<SwipeAndConnectProvider>(context, listen: false);
+      return user.interests!
+          .map((id) => provider.interestsMap[id] ?? 'Interest: $id')
+          .toList();
+    }
+
+    return ['General'];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -86,7 +118,7 @@ class _SwipeAndConnectScreenState extends State<SwipeAndConnectScreen> {
         Scaffold(
           body: Consumer<SwipeAndConnectProvider>(
             builder: (context, provider, _) {
-              if (provider.isLoading) {
+              if (provider.isLoading || _isLoadingInterests) {
                 return Center(
                   child: CircularProgressIndicator(),
                 );
@@ -140,6 +172,8 @@ class _SwipeAndConnectScreenState extends State<SwipeAndConnectScreen> {
                           itemCount: provider.attendees.length,
                           controller: _pageController,
                           itemBuilder: (context, index) {
+                            final user = provider.attendees[index];
+                            final interestNames = getInterestNames(user);
                             return ValueListenableBuilder<double>(
                               valueListenable: offsetXNotifier,
                               builder: (context, offsetX, child) {
@@ -214,9 +248,8 @@ class _SwipeAndConnectScreenState extends State<SwipeAndConnectScreen> {
                                                 : provider.attendees[index]
                                                         .position ??
                                                     '',
-                                            interests: provider.attendees[index]
-                                                    .interests ??
-                                                [],
+                                            interests: interestNames,
+                                            // Use the interest names instead of IDs
                                             description: provider
                                                     .attendees[index]
                                                     .description ??

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:my_test_app_flavors/core/constants/font_constants.dart';
 import 'package:my_test_app_flavors/core/constants/icon_constants.dart';
 import 'package:my_test_app_flavors/modules/auth/services/app_user.dart';
 import 'package:my_test_app_flavors/modules/events/speakers/services/speaker_provider.dart';

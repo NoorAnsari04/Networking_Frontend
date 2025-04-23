@@ -87,17 +87,7 @@ class AppRoutes {
           GoRoute(
             name: SpeakersScreen.id,
             path: SpeakersScreen.id,
-            pageBuilder: (context, state) {
-              final parentArgs = state.extra as Map<String, dynamic>? ?? {};
-              final event = parentArgs['event'] as EventModel?;
-              if (event == null) {
-                // Handle missing event case - redirect or show error
-                return MaterialPage(child: Scaffold(body: Center(child: Text('Event not found'))));
-              }
-              return MaterialPage(
-                  child: SpeakersScreen(eventId: event.eventId),
-              );
-            },
+            builder: (context, state) => SpeakersScreen(),
             routes: [
               GoRoute(
                 name: SpeakerProfile.id,

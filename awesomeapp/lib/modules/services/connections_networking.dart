@@ -1,11 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:image/image.dart';
 import 'package:my_test_app_flavors/core/constants/api_constants.dart';
 import 'package:my_test_app_flavors/core/serviceLocator.dart';
 import 'package:my_test_app_flavors/core/services/hive_services.dart';
-import 'package:my_test_app_flavors/main.dart';
 import 'package:my_test_app_flavors/modules/auth/services/auth_provider.dart';
 import '../../core/constants/dio_client.dart';
 import '../auth/services/app_user.dart';
