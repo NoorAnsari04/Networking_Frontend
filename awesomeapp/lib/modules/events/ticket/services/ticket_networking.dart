@@ -1,3 +1,4 @@
+
 import 'package:dio/dio.dart' as dio;
 import 'package:my_test_app_flavors/core/constants/api_constants.dart';
 import 'package:my_test_app_flavors/core/constants/dio_client.dart';
@@ -9,7 +10,7 @@ class TicketNetworking {
   Future<Map<String, dynamic>> getTicketDetails(String eventId) async {
     final url = ApiConstants.baseUrl + '/api/ticket/$eventId';
     try {
-      String? token = serviceLocator<AuthenticationProvider>().authToken();
+      final token = await serviceLocator<AuthenticationProvider>().authToken();
       final dioInstance = DioClient.getDioInstance();
 
       final response = await dioInstance.post(url,

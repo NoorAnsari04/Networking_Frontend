@@ -301,7 +301,7 @@ class SwipeAndConnectNetworking {
     try {
       final url =
           ApiConstants.baseUrl + '/api/snc//conference/$conferenceId/swipe';
-      String? token = serviceLocator<AuthenticationProvider>().authToken();
+      final token = await serviceLocator<AuthenticationProvider>().authToken();
 
       final response = await dioInstance.post(
         url,
