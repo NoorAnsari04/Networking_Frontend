@@ -29,8 +29,7 @@ class AuthenticationProvider with ChangeNotifier {
     _appUser = _hiveService.getUser();
   }
 
-  Future<bool> login(
-      BuildContext context, String email, String password) async {
+  Future<bool> login(BuildContext context, String email, String password) async {
     try {
       _setLoading(true);
       final AppUser? user = await _authNetworking.login(email, password);
@@ -59,17 +58,29 @@ class AuthenticationProvider with ChangeNotifier {
   }
 
   Future<bool> signOut() async {
-    _setLoading(true);
-    final bool result = await _authNetworking.signOut();
-    _setLoading(false);
+    try {
+      _setLoading(true);
 
-    if (result) {
+      // Optional: Call your backend logout API (if implemented)
+      final bool result = await _authNetworking.signOut();
+
+      // Clear local user data regardless of backend result
       _appUser = null;
+      _userCredential = null;
       _hiveService.deleteUser();
+
+      _setLoading(false);
       notifyListeners();
+
+      print("Sign out successful");
+      return result;
+    } catch (e) {
+      _setLoading(false);
+      print("Error during sign out: $e");
+      return false;
     }
-    return result;
   }
+
 
   Future<bool> signUp(BuildContext context,
       {required String email,
@@ -124,25 +135,19 @@ class AuthenticationProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> googleSignIn() async {
+  Future<bool> googleSignIn(BuildContext context) async {
     _setLoading(true);
     final user = await _socialNetworking.signInWithGoogle();
     _setLoading(false);
 
     if (user != null) {
       // Check if user document exists
-      bool documentExists =
-          await _socialNetworking.isUserDocumentExist(user.uid);
-
-      if (documentExists) {
-        // If document exists, fetch user data
-        _appUser = await _socialNetworking.getUserData(user.uid);
-        if (_appUser != null) {
-          _hiveService.saveUser(_appUser!);
-          notifyListeners();
-        }
-      }
-
+      final appUser = user['appUser'] as AppUser;
+      final firebaseUser = user['firebaseUser'];
+      final token = user['token'];
+      _appUser = appUser;
+      _hiveService.saveUser(_appUser!);
+      notifyListeners();
       return true;
     }
     return false;
@@ -190,13 +195,20 @@ class AuthenticationProvider with ChangeNotifier {
     };
   }
 
-  String? authToken() {
-    // if (_appUser != null) {
-    //   return _appUser!.accessToken;
-     return HiveService().getUser()?.accessToken;
+  Future<String?> authToken() async {
+    if (_appUser?.accessToken != null) {
+      return _appUser!.accessToken;
     }
+    final user = await _hiveService.getUser();
+    if (user != null) {
+      _appUser = user;
+      return user.accessToken;
+    }
+    return null;
+  }
 
-    // return null;
+
+  // return null;
   
 
   Future<String?> getAuthToken(String refreshToken) async {
@@ -222,4 +234,14 @@ class AuthenticationProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
+  void clear(){
+    print("Authentication provider cleared");
+    _appUser = null;
+    _userCredential = null;
+    _isLoading = false;
+    _hiveService.deleteUser();
+    notifyListeners();
+  }
 }
+
