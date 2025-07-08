@@ -57,7 +57,7 @@ void submitForm(
     final String url = ApiConstants.baseUrl + ApiConstants.userDetails;
 
     try {
-      String? token = serviceLocator<AuthenticationProvider>().authToken();
+      final token =await serviceLocator<AuthenticationProvider>().authToken();
       final dioInstance = DioClient.getDioInstance();
       // print("Access Token: $token");
       log("Access Token: $token");
