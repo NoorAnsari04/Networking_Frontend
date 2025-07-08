@@ -34,7 +34,7 @@ class AttendeeCard extends StatelessWidget {
     required this.onSkip,
     required this.onConnect,
     this.showSecondCard = true,
-    this.isReceivedRequest = false,
+    this.isReceivedRequest = true,
   }) : super(key: key);
 
   @override
@@ -66,7 +66,7 @@ class AttendeeCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                if (isReceivedRequest)
+                // if (isReceivedRequest)
                   Container(
                     padding: EdgeInsets.symmetric(vertical: 10.h),
                     decoration: BoxDecoration(
@@ -76,11 +76,14 @@ class AttendeeCard extends StatelessWidget {
                         topRight: Radius.circular(35.0),
                       ),
                     ),
-                    child: Text(
-                      'Wants to Connect With You',
-                      textAlign: TextAlign.center,
-                      style: kRaleway.copyWith(fontSize: 14),
+                    child: SizedBox(
+                      height: 18.h,
                     ),
+                    // child: Text(
+                    //   'Wants to Connect With You',
+                    //   textAlign: TextAlign.center,
+                    //   style: kRaleway.copyWith(fontSize: 14, color: Colors.white),
+                    // ),
                   ),
                 Padding(
                   padding: EdgeInsets.all(16.w),
@@ -91,6 +94,8 @@ class AttendeeCard extends StatelessWidget {
                           imageUrl: imageUrl,
                           outerRadius: 65.w,
                           innerRadius: 55.w,
+                          name: name,
+                          lastName: lastName,
                         ),
                       ),
                       SizedBox(height: 10.h),
@@ -155,14 +160,18 @@ class AttendeeCard extends StatelessWidget {
                                   ),
                                 ),
                                 Wrap(
+                                  spacing: 8.0,
+                                  runSpacing: 4.0,
                                   children: interests
                                       .take(2)
                                       .map((interest) => Chip(
                                             label: Text(interest),
                                             backgroundColor:
                                                 Colors.white.withOpacity(0.2),
-                                            labelStyle:
-                                                TextStyle(color: Colors.black),
+                                            labelStyle: TextStyle(color: Colors.black),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
                                           ))
                                       .toList(),
                                 ),
@@ -195,6 +204,8 @@ class AttendeeCard extends StatelessWidget {
                             style: ElevatedButton.styleFrom(
                               // primary: Colors.white,
                               // onPrimary: Colors.black,
+                              backgroundColor: Colors.white,
+                              foregroundColor: ColorConstants.primaryColor,
                               padding: EdgeInsets.symmetric(
                                   horizontal: 40.w, vertical: 12.h),
                               shape: RoundedRectangleBorder(
@@ -208,6 +219,9 @@ class AttendeeCard extends StatelessWidget {
                             style: ElevatedButton.styleFrom(
                               padding: EdgeInsets.symmetric(
                                   horizontal: 30.w, vertical: 12.h),
+                              shape:RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0)
+                              )
                             ),
                             child:
                                 Text(isReceivedRequest ? 'Accept' : 'Connect'),
@@ -220,6 +234,7 @@ class AttendeeCard extends StatelessWidget {
               ],
             ),
           ),
+
         ),
       ],
     );
