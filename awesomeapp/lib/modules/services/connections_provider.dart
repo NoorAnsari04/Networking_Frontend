@@ -31,9 +31,11 @@ class ConnectionsProvider with ChangeNotifier {
     }
   }
 
-  void clearConnections() {
-    _connections.clear();
+  void clear() {
+    _connections = [];
+    _isLoading = false;
     _errorMessage = null;
     notifyListeners();
   }
+
 }
