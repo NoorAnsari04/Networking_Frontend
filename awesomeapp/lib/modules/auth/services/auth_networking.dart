@@ -13,20 +13,14 @@ class AuthNetworking {
     baseUrl: ApiConstants.baseUrl,
   ));
 
-  Future<AppUser?> signUp({
-    required String email,
-    required String password,
-    required String firstName,
-    required String lastname,
-    required String confirmPassword,
-  }) async {
+  Future<AppUser?> signUp({required String email, required String password, required String firstName, required String lastname, required String confirmPassword,}) async {
     try {
       final response = await _dio.post(ApiConstants.signUp, data: {
-        "firstName": firstName,
-        "lastName": lastname,
-        "email": email,
-        "password": password,
-        "confirmPassword": confirmPassword,
+      "firstName": firstName,
+      "lastName": lastname,
+      "email": email,
+      "password": password,
+      "confirmPassword": confirmPassword,
       });
       print('Signup Response: ${response.data}');
 
@@ -63,14 +57,13 @@ class AuthNetworking {
       } else {
         print('Unexpected status code: ${response.statusCode}');
       }
-    } catch (e) {
-      print('Signup API Error: $e');
-    }
-    return null;
+  } catch (e) {
+    print('Signup API Error: $e');
+  }
+  return null;
   }
 
-  Future<void> createUserDocument(
-      String userId, Map<String, dynamic> userData) async {
+  Future<void> createUserDocument(String userId, Map<String, dynamic> userData) async {
     try {
       await firestore.collection('users').doc(userId).set(userData);
     } catch (e) {
