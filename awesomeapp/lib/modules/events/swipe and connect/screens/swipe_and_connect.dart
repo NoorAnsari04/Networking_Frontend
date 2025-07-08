@@ -57,7 +57,7 @@ class _SwipeAndConnectScreenState extends State<SwipeAndConnectScreen> {
     _pageController = PageController(initialPage: 0, viewportFraction: 1);
     final provider =
         Provider.of<SwipeAndConnectProvider>(context, listen: false);
-
+    provider.loadUsers(widget.event.eventId);
     // Validate conferenceId before loading users
     if (!isValidConferenceId(widget.event.eventId)) {
       print("Invalid conferenceId: ${widget.event.eventId}");
@@ -147,8 +147,14 @@ class _SwipeAndConnectScreenState extends State<SwipeAndConnectScreen> {
                         ),
                         SizedBox(width: 250.w),
                         GestureDetector(
-                          onTap: () {
-                            context.pushNamed(PreferencesScreen.id);
+                          onTap: () async {
+                            final result = await context.pushNamed(PreferencesScreen.id);
+                            if(result != null && result is Map){
+                              final profession = result['profession'];
+                              final industry = result['industry'];
+                              final provider = Provider.of<SwipeAndConnectProvider>(context, listen: false);
+                              provider.loadUsers(widget.event.eventId, profession: profession, industry: industry);
+                            }
                           },
                           child: Padding(
                             padding: EdgeInsets.all(10.w),
@@ -213,7 +219,7 @@ class _SwipeAndConnectScreenState extends State<SwipeAndConnectScreen> {
                                               conferenceId:
                                                   widget.event.eventId);
                                           context
-                                              .showSnackBar('Rejected request');
+                                              .showSnackBar('User skipped');
                                         }
                                         showSecondCard.value = true;
                                       },
