@@ -60,30 +60,54 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 20.h),
-              SafeArea(
-                child: CustomAppBar(
-                  title: 'Preferences',
+              // SizedBox(height: 20.h),
+                 CustomAppBar(
+                  title: 'Advance Filters',
                   iconPath: IconConstants.backward_arrow,
-                ),
               ),
               SizedBox(height: 40.h),
-              UserTypeSelection(
-                userType: userType,
-                onChanged: (value) {
-                  setState(() {
-                    userType = value!;
-                  });
-                },
-                title: 'Whom do you want to connect with?',
+              // UserTypeSelection(
+              //   userType: userType,
+              //   onChanged: (value) {
+              //     setState(() {
+              //       userType = value!;
+              //     });
+              //   },
+              //   title: 'Whom do you want to connect with?',
+              // ),
+              Text("Whom do you want to connect with?", style: TextStyle(fontSize: 16.sp),),
+              SizedBox(height: 8  .h),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 12.w),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius:   BorderRadius.circular(5)
+                ),
+                child: DropdownButton<String>(
+                  value: userType,
+                  isExpanded: true,
+                  underline: SizedBox(),
+                  icon: Icon(Icons.arrow_drop_down),
+                  items: ['Student', 'Industry Person'].map((String type) {
+                    return DropdownMenuItem<String>(
+                      value: type,
+                      child: Text(type),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      userType = newValue!;
+                    });
+                  },
+                ),
               ),
               SizedBox(height: 20.h),
               if (userType == 'Industry Person') ...[
-                Text('Profession:', style: TextStyle(fontSize: 16.sp)),
+                Text('Designation:', style: TextStyle(fontSize: 16.sp)),
                 Container(
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(5),
+                  border:Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(5),
                   ),
                   child: DropdownButton<String>(
                     value: selectedProfession,
@@ -94,18 +118,16 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
                         child: Text(profession),
                       );
                     }).toList(),
-                    onChanged: (String? newValue) {
+                    onChanged: (String? newValue){
                       setState(() {
                         selectedProfession = newValue;
                       });
                     },
-                    underline: SizedBox(),
-                    icon: Icon(Icons.arrow_drop_down),
                   ),
                 ),
                 SizedBox(height: 20.h),
               ],
-              Text('Industry:', style: TextStyle(fontSize: 16.sp)),
+              Text('Interests:', style: TextStyle(fontSize: 16.sp)),
               Container(
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey),
@@ -132,8 +154,13 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
               SizedBox(height: 20.h),
               Center(
                 child: CustomElevatedButton(
-                  onPressed: () {},
-                  text: 'Submit',
+                  onPressed: () {
+                    Navigator.pop(context,{
+                      'profession': selectedProfession,
+                      'industry': selectedIndustry,
+                    });
+                  },
+                  text: 'Done',
                   manualAction: true,
                 ),
               ),
