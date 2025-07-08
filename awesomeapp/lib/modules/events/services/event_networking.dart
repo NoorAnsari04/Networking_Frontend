@@ -8,9 +8,10 @@ import 'package:dio/dio.dart' as dio;
 class EventNetworking {
   static Future<List<EventModel>> fetchEvents() async {
     final url = ApiConstants.baseUrl + ApiConstants.allEvents;
+    print('Requesting events from: $url');
 
     try {
-      String? token = serviceLocator<AuthenticationProvider>().authToken();
+      final token = await serviceLocator<AuthenticationProvider>().authToken();
       print("Access Token: $token");
       final dioInstance = DioClient.getDioInstance();
       final response = await dioInstance.get(url,
@@ -19,17 +20,17 @@ class EventNetworking {
               "Authorization": "Bearer $token",
             },
           ));
-      print('Error: ${response.statusCode}, ${response.data}');
+      print('Status Code: ${response.statusCode}, ${response.data}');
       if (response.statusCode == 200) {
         // Check if the response data is a list
-        if (response.data["allConferences"] is List) {
-          final List<dynamic> data = response.data["allConferences"];
+        if (response.data['data']["conferences"] is List) {
+          final List<dynamic> data = response.data["data"]["conferences"];
           return data.map((e) => EventModel.fromJson(e)).toList();
         } else {
           throw Exception('Failed to load events');
         }
       } else {
-        throw Exception('Failed to load events');
+        throw Exception('Failed to load events 1');
       }
     } catch (e) {
       print('Error fetching events: $e');
@@ -39,8 +40,9 @@ class EventNetworking {
 
   static Future<EventModel> fetchEventById(eventId) async {
     final url = ApiConstants.baseUrl + "/api/conference/$eventId";
+    print(url);
     try {
-      String? token = serviceLocator<AuthenticationProvider>().authToken();
+      final token = await serviceLocator<AuthenticationProvider>().authToken();
       final dioInstance = DioClient.getDioInstance();
       print(token);
 
@@ -51,7 +53,7 @@ class EventNetworking {
       print(response.data); // Log the raw response
 
       if (response.statusCode == 200 && response.data != null) {
-        final eventData = response.data['conference'];
+        final eventData = response.data['data']['conference'];
         if (eventData == null) {
           throw Exception('Event data is null');
         }
