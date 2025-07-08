@@ -110,8 +110,15 @@ class TicketCard extends StatelessWidget {
       left: MediaQuery.of(context).size.width / 2 - 60,
       child: UserProfileAvatar(
         imageUrl: appUser.imageUrl,
+        name: appUser.name,
+        lastName: appUser.lastName,
         outerRadius: 46.w,
         innerRadius: 40.w,
+        textStyle: TextStyle(
+          fontSize: 16.sp,
+          fontWeight: FontWeight.bold,
+          color: Colors.white
+        ),
       ),
     );
   }
