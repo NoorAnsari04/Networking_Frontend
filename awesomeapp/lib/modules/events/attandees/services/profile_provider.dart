@@ -44,4 +44,10 @@ class ProfileProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
+  void clear() {
+    _isLoading = false;
+    notifyListeners();
+  }
+
 }
