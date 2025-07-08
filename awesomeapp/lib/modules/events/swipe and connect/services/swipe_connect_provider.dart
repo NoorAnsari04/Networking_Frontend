@@ -123,4 +123,16 @@ class SwipeAndConnectProvider with ChangeNotifier {
       throw error;
     }
   }
+
+  void clear() {
+    _rejectedUsers = [];
+    _acceptedUsers = [];
+    _currentIndex = 0;
+    _attendees = [];
+    _isLoading = false;
+    _interestsMap = {};
+    _isLoadingInterests = false;
+    notifyListeners();
+  }
+
 }
