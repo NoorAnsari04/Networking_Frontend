@@ -64,8 +64,15 @@ class ConnectedProfiles extends StatelessWidget {
                       child: Center(
                         child: UserProfileAvatar(
                           imageUrl: user.imageUrl,
+                          name: user.name,
+                          lastName: user.lastName,
                           outerRadius: 90.w,
                           innerRadius: 80.w,
+                          textStyle: TextStyle(
+                            fontSize: 26.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white
+                          ),
                         ),
                       ),
                     ),
