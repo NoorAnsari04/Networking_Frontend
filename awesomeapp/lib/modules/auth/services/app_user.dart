@@ -59,6 +59,12 @@ class AppUser {
   @HiveField(16)
   String? userType;
 
+  @HiveField(17)
+  bool? isSpeaker;
+
+  @HiveField(18)
+  List<String>? conferenceId;
+
   List<String>? interests;
   List<String>? interestNames;
 
@@ -86,6 +92,8 @@ class AppUser {
     this.accessToken,
     this.refreshToken,
     this.score = 0,
+    this.isSpeaker,
+    this.conferenceId
   });
 
   factory AppUser.fromJson(Map<String, dynamic> jsonUser) {
@@ -112,6 +120,8 @@ class AppUser {
       accessToken: jsonUser['accessToken'],
       refreshToken: jsonUser['refreshToken'],
       score: jsonUser['score']?? 0,
+      isSpeaker: jsonUser['isSpeaker'],
+      conferenceId: (jsonUser['conferenceId'] as List<dynamic?>?)?.cast<String>()
     );
   }
 
@@ -140,6 +150,8 @@ class AppUser {
       'accessToken': accessToken,
       'refreshToken': refreshToken,
       'score':'score',
+      'isSpeaker': isSpeaker,
+      'conferenceId': conferenceId
     };
   }
 
