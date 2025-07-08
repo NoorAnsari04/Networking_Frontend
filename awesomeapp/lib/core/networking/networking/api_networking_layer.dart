@@ -33,7 +33,7 @@ class ApiNetworkingLayer {
     dynamic body,
     bool hasToken = false,
   }) async {
-    final Options options = _generateOptions(
+    final Options options = await _generateOptions(
       type.name,
       hasToken,
     );
@@ -68,13 +68,13 @@ class ApiNetworkingLayer {
     }
   }
 
-  Options _generateOptions(
+  Future<Options> _generateOptions(
     String method,
     bool hasToken,
-  ) {
+  ) async {
     Map<String, String> headers = {};
 
-    String? token = serviceLocator<AuthenticationProvider>().authToken();
+    final token = await serviceLocator<AuthenticationProvider>().authToken();
     if (hasToken && token != null && token.isNotEmpty) {
       headers['Authorization'] = token;
     }
