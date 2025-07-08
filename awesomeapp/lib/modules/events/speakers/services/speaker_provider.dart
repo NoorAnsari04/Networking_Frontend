@@ -65,10 +65,15 @@ class SpeakerProvider with ChangeNotifier {
     }
   }
 
-  Future<void> createMeetingRequest(MeetingRequest request) async {
-    var res = await _speakerNetworking.createMeetingRequest(request);
+  Future<void> createMeetingRequest({
+    required String receiverId,
+    required String conferenceId
+  }) async {
+     await _speakerNetworking.createMeetingRequest(
+         receiverId: receiverId,
+         conferenceId: conferenceId
+     );
     notifyListeners();
-    return res;
   }
 
   Future<String> getRequestStatus(String receiverId) async {
@@ -127,4 +132,13 @@ class SpeakerProvider with ChangeNotifier {
       }).toList();
     }
   }
+
+  void clear() {
+    _speakers = [];
+    _meetingRequests = [];
+    _isLoading = false;
+    _errorMessage = null;
+    notifyListeners();
+  }
+
 }
