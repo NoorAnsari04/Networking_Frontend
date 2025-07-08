@@ -29,8 +29,8 @@ class RefreshTokenInterceptor extends Interceptor {
     if (_isAuthenticationError(err)) {
       await _handleAuthenticationError(err, handler);
     } else if (_isAuthorizationError(err)) {
-      String accessToken =
-          serviceLocator.get<AuthenticationProvider>().authToken() ?? "";
+      final accessToken =
+          await serviceLocator.get<AuthenticationProvider>().authToken() ?? "";
       if (accessToken.isEmpty) {
         super.onError(err, handler);
         return;
@@ -119,7 +119,7 @@ class RefreshTokenInterceptor extends Interceptor {
   }
 
   Future<Response> _retry(RequestOptions requestOptions) async {
-    String accessToken = serviceLocator<AuthenticationProvider>().authToken()!;
+    final accessToken = await serviceLocator<AuthenticationProvider>().authToken()!;
 
     final response = await Dio().request(
       requestOptions.path,
