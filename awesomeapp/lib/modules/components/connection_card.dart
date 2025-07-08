@@ -32,7 +32,7 @@ class ConnectionCard extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               SvgPicture.asset(
-                isStudent ? 'assets/university_bg.svg' : 'assets/company.svg',
+                isStudent ? 'assets/university.svg' : 'assets/company.svg',
                 height: 24.h,
               ),
               SizedBox(width: 8.w),
