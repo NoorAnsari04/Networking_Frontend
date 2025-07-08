@@ -37,4 +37,12 @@ class NavigationProvider extends ChangeNotifier {
         (route) => false);
     resetTab();
   }
+
+  void clear() {
+    currentTabIndex = 0;
+    controller.jumpToPage(0);
+    isLoading = false;
+    notifyListeners();
+  }
+
 }
