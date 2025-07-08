@@ -54,12 +54,11 @@ class ProfileNetworking {
     }
   }
 
-  Future<bool> updateProfile(String id, Map<String, dynamic> UserDetails,
-      String profileImgPath) async {
+  Future<bool> updateProfile(String id, Map<String, dynamic> UserDetails, String profileImgPath) async {
     try {
       // await _firestore.collection('users').doc(id).update(UserDetails);
       // return true;
-      String? token = serviceLocator<AuthenticationProvider>().authToken();
+      final token = await serviceLocator<AuthenticationProvider>().authToken();
       if (token == null) {
         print("Token is null, User is not authenticated");
         return false;
@@ -94,21 +93,26 @@ class ProfileNetworking {
       if (response.statusCode == 200 && response.data['success'] == true) {
         print("Profile updated successfully");
         final Map<String, dynamic> userData = response.data ['data']['user'] ?? {};
-        userData['accessToken'] = token ;
-        // final String? newToken = response.data['data']['accessToken'];
-        print("Token retrieved: $token");
-        final authProvider = serviceLocator<AuthenticationProvider>();
-        authProvider.updateUser(AppUser.fromJson(userData));
-        if(userData.isNotEmpty){
-          final appUser = AppUser.fromJson(userData);
-          print("Saving user: ${jsonEncode(appUser.toJson())}");
-          await HiveService().saveUser(appUser);
-          await HiveService().saveAccessToken(token);
-          final savedUser = await HiveService().getUser();
-          print("Saved user from Hive: ${jsonEncode(savedUser?.toJson())}");
-        } else {
-          print("User data is missing or empty");
+        final String? newToken = response.data['data']['accessToken'];
+        if(newToken == null){
+          print("New access token missing from response");
+          return false;
         }
+        userData['accessToken'] = newToken;
+        // final String? newToken = response.data['data']['accessToken'];
+        print("Token retrieved: $newToken ");
+        final authProvider = serviceLocator<AuthenticationProvider>();
+        final updatedUser = AppUser.fromJson(userData);
+        authProvider.updateUser(updatedUser);
+        authProvider.updateToken(newToken);
+        await HiveService().saveUser(updatedUser);
+        await HiveService().saveAccessToken(newToken);
+        final savedToken = await HiveService().getAccessToken();
+        print("Access token from Hive after update: $savedToken");
+
+        final savedUser = await HiveService().getUser();
+          print("Saved user from Hive: ${jsonEncode(savedUser?.toJson())}");
+
         return true;
       } else {
         print("Failed to update profile: ${response.data['message']}");
