@@ -3,9 +3,15 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:my_test_app_flavors/core/extensions/extension.dart';
 import 'package:my_test_app_flavors/modules/auth/screens/signup_screen.dart';
+import 'package:my_test_app_flavors/modules/events/attandees/services/profile_provider.dart';
+import 'package:my_test_app_flavors/modules/events/services/event_provider.dart';
+import 'package:my_test_app_flavors/modules/events/speakers/services/speaker_provider.dart';
+import 'package:my_test_app_flavors/modules/navigation/navigation_provider.dart';
+import 'package:my_test_app_flavors/modules/services/connections_provider.dart';
 import 'package:provider/provider.dart';
 import '../../../../../core/constants/color_constants.dart';
 import '../../../auth/services/auth_provider.dart';
+import '../../swipe and connect/services/swipe_connect_provider.dart';
 import '../components/user_info_section.dart';
 import '../components/profile_action_card.dart';
 
@@ -52,11 +58,17 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _handleSignOut(
-      BuildContext context, AuthenticationProvider authProv) async {
+  Future<void> _handleSignOut(BuildContext context, AuthenticationProvider authProv) async {
     final bool result = await authProv.signOut();
 
     if (result) {
+      Provider.of<AuthenticationProvider>(context, listen: false).clear();
+      Provider.of<SpeakerProvider>(context, listen: false).clear();
+      Provider.of<ProfileProvider>(context, listen: false).clear();
+      Provider.of<EventProvider>(context, listen: false).clear();
+      Provider.of<SwipeAndConnectProvider>(context, listen: false).clear();
+      Provider.of<ConnectionsProvider>(context, listen: false).clear();
+      Provider.of<NavigationProvider>(context, listen: false).clear();
       context.goNamed(SignupScreen.id);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
