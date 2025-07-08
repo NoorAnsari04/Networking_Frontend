@@ -33,8 +33,15 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<EventProvider>(context, listen: false).fetchEvents();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final authProvider = Provider.of<AuthenticationProvider>(context, listen: false);
+      final token = await authProvider.authToken();
+
+      if (token != null && token.isNotEmpty && authProvider.appUser != null) {
+        Provider.of<EventProvider>(context, listen: false).fetchEvents();
+      } else {
+        print('User not authenticated, skipping fetchEvents');
+      }
     });
   }
 
