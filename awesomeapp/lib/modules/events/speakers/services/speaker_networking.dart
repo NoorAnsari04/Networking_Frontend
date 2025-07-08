@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:my_test_app_flavors/core/constants/dio_client.dart';
 import 'package:my_test_app_flavors/core/serviceLocator.dart';
@@ -52,13 +53,13 @@ class SpeakerNetworking {
     // }
     final url = ApiConstants.baseUrl + '/api/speaker/$eventId';
     try {
-      String? token = serviceLocator<AuthenticationProvider>().authToken();
+      final token = await serviceLocator<AuthenticationProvider>().authToken();
       final dioInstance = DioClient.getDioInstance();
       print(token);
 
       final response = await dioInstance.get(url,
           options: dio.Options(headers: {
-            "Authorization": "Bearer: $token",
+            "Authorization": "Bearer $token",
           }));
       print(response.data);
 
@@ -171,7 +172,7 @@ class SpeakerNetworking {
     required String senderId,
     required String receiverId,
     required String action,
-  }) async {
+    }) async {
     try {
       final dioInstance = DioClient.getDioInstance();
       final url = ApiConstants.baseUrl + ApiConstants.handleConnectionRequests;
@@ -231,12 +232,37 @@ class SpeakerNetworking {
     }
   }
 
-  Future<void> createMeetingRequest(MeetingRequest request) async {
-    try {
-      await _firestore.collection('meeting_requests').add(request.toJson());
-    } catch (e) {
-      print('Error creating meeting request: $e');
-      throw e;
+  Future<void>  createMeetingRequest({required String receiverId, required String conferenceId}) async {
+    try{
+      final dioInstance = DioClient.getDioInstance();
+      final url = ApiConstants.baseUrl + ApiConstants.connectSpeakers;
+
+      final token = await serviceLocator<AuthenticationProvider>().authToken();
+      final response = await dioInstance.post(
+        url,
+        data:{
+          'receiverId': receiverId,
+          'conferenceId': conferenceId
+        },
+        options: dio.Options(
+          headers:{
+            "Authorization": "Bearer $token"
+          }
+        )
+      );
+      print("Create meeting request response: ${response.data}");
+      if (response.statusCode == 200 && response.data != null){
+        final Map<String, dynamic> responseData = response.data;
+        if (!(responseData['success'] ?? false )) {
+          throw Exception(responseData['message']?? "Meeting request failed");
+        }
+        print("Meeting request created: ${responseData['message']}");
+      } else {
+        throw Exception("Failed to create meeting request");
+      }
+    } catch (e){
+      print("Error creating meeting request: $e");
+      throw Exception('Failed to create meeting request: $e');
     }
   }
 }
