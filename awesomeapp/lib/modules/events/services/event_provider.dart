@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:my_test_app_flavors/modules/events/services/event_networking.dart';
+import '../../../core/serviceLocator.dart';
+import '../../auth/services/auth_provider.dart';
 import 'event_model.dart';
 
 class EventProvider with ChangeNotifier {
@@ -13,6 +15,14 @@ class EventProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
 
   Future<void> fetchEvents() async {
+    final token = await serviceLocator<AuthenticationProvider>().authToken();
+
+    if (token == null || token.isEmpty) {
+      print("No token found. Skipping fetchEvents.");
+      _isLoading = false;
+      notifyListeners();
+      return;
+    }
     _isLoading = true;
     notifyListeners();
 
@@ -22,8 +32,12 @@ class EventProvider with ChangeNotifier {
         _events = List.from(res);
         _events.sort((a, b) => EventModel.parseDate(a.startDate)
             .compareTo(EventModel.parseDate(b.startDate)));
+      } else {
+        _events = [];
       }
     } catch (e) {
+      print("Error fetching events: $e");
+      _events = [];
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -52,4 +66,12 @@ class EventProvider with ChangeNotifier {
     _selectedEvent = null;
     notifyListeners();
   }
+
+  void clear() {
+    _events = [];
+    _selectedEvent = null;
+    _isLoading = false;
+    notifyListeners();
+  }
+
 }
