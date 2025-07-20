@@ -131,6 +131,7 @@ class AuthNetworking {
           final appUser = AppUser.fromJson(userData);
           await HiveService().saveUser(appUser);
           print('Login Successfull: ${appUser.fullName}');
+          print("User: ${appUser}");
           return appUser;
         } else {
           print("the user is null");
