@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:my_test_app_flavors/core/constants/color_constants.dart';
@@ -11,11 +13,13 @@ import '../services/event_model.dart';
 class TicketCard extends StatelessWidget {
   final AppUser appUser;
   final EventModel eventModel;
+  final Map<String, dynamic>? ticketDetails;
 
   const TicketCard({
     Key? key,
     required this.appUser,
     required this.eventModel,
+    required this.ticketDetails,
   }) : super(key: key);
 
   @override
@@ -60,7 +64,7 @@ class TicketCard extends StatelessWidget {
             children: [
               20.height,
               Text('${appUser.name} ${appUser.lastName}', style: kRaleway),
-              Text('${appUser.position}' ,
+              Text('${appUser.position}',
                   style: kRaleway.copyWith(fontSize: 16.sp)),
             ],
           ),
@@ -96,12 +100,19 @@ class TicketCard extends StatelessWidget {
   }
 
   Widget _buildQRCode() {
-    return QrImageView(
-      data: 'This is a simple QR code',
-      version: QrVersions.auto,
-      size: 220,
-      gapless: false,
-    );
+    final qrCode = ticketDetails?['data']['ticket']['qrCode'];
+    if(qrCode == null){
+      print("QR code not available");
+    }
+    final base64Str = qrCode.toString().split(',').last;
+    final bytes = base64Decode(base64Str);
+    // return QrImageView(
+    //   data: 'This is a simple QR code',
+    //   version: QrVersions.auto,
+    //   size: 220,
+    //   gapless: false,
+    // );
+    return Image.memory(bytes, width: 220, height: 220,fit: BoxFit.cover,);
   }
 
   Widget _buildAvatar(BuildContext context) {
@@ -115,10 +126,7 @@ class TicketCard extends StatelessWidget {
         outerRadius: 46.w,
         innerRadius: 40.w,
         textStyle: TextStyle(
-          fontSize: 16.sp,
-          fontWeight: FontWeight.bold,
-          color: Colors.white
-        ),
+            fontSize: 16.sp, fontWeight: FontWeight.bold, color: Colors.white),
       ),
     );
   }
