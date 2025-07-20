@@ -63,36 +63,41 @@ class ProfileNetworking {
         print("Token is null, User is not authenticated");
         return false;
       }
-
       print("Retrieved token: $token");
+      // final Map<String, dynamic> updatedData = {
+      //   if (UserDetails['name'] != null) 'name': UserDetails['name'],
+      //   if (UserDetails['company'] != null) 'company': UserDetails['company'],
+      //   if (UserDetails['position'] != null)
+      //     'position': UserDetails['position'],
+      //   if (UserDetails['email'] != null) 'email': UserDetails['email'],
+      //   if (UserDetails['description'] != null)
+      //     'description': UserDetails['description'],
+      //   if (UserDetails['linkedInUrl'] != null)
+      //     'linkedInUrl': UserDetails['linkedInUrl'],
+      // };
 
-      final Map<String, dynamic> updatedData = {
-        if (UserDetails['name'] != null) 'name': UserDetails['name'],
-        if (UserDetails['company'] != null) 'company': UserDetails['company'],
-        if (UserDetails['position'] != null)
-          'position': UserDetails['position'],
-        if (UserDetails['email'] != null) 'email': UserDetails['email'],
-        if (UserDetails['description'] != null)
-          'description': UserDetails['description'],
-        if (UserDetails['linkedInUrl'] != null)
-          'linkedInUrl': UserDetails['linkedInUrl'],
-      };
 
-      updatedData['profileImg'] = profileImgPath;
 
+      // updatedData['profileImg'] = profileImgPath;
       final url = ApiConstants.baseUrl + ApiConstants.editProfile;
       final dioInstance = DioClient.getDioInstance();
+      final formData = dio.FormData.fromMap({
+        ...UserDetails,
+        if (profileImgPath != null && profileImgPath.isNotEmpty)
+          'profileImg': await dio.MultipartFile.fromFile(profileImgPath, filename: 'profile.jpg'),
+      });
       final response = await dioInstance.put(url,
-          data: updatedData,
+          data: formData,
           options: dio.Options(
             headers: {
               "Authorization": "Bearer $token",
+              "Content-Type": "multipart/form-data"
             },
           ));
 
       if (response.statusCode == 200 && response.data['success'] == true) {
         print("Profile updated successfully");
-        final Map<String, dynamic> userData = response.data ['data']['user'] ?? {};
+        final userData = response.data ['data']['user'] ?? {};
         final String? newToken = response.data['data']['accessToken'];
         if(newToken == null){
           print("New access token missing from response");
@@ -103,15 +108,18 @@ class ProfileNetworking {
         print("Token retrieved: $newToken ");
         final authProvider = serviceLocator<AuthenticationProvider>();
         final updatedUser = AppUser.fromJson(userData);
+        updatedUser.accessToken = newToken;
         authProvider.updateUser(updatedUser);
         authProvider.updateToken(newToken);
         await HiveService().saveUser(updatedUser);
         await HiveService().saveAccessToken(newToken);
+
+        print("Token updated: $newToken");
         final savedToken = await HiveService().getAccessToken();
         print("Access token from Hive after update: $savedToken");
-
-        final savedUser = await HiveService().getUser();
-          print("Saved user from Hive: ${jsonEncode(savedUser?.toJson())}");
+        //
+        // final savedUser = await HiveService().getUser();
+        //   print("Saved user from Hive: ${jsonEncode(savedUser?.toJson())}");
 
         return true;
       } else {
