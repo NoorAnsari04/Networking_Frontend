@@ -34,22 +34,43 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       body: Column(
         children: [
           // Top Section with Event Title
-          Padding(
-            padding: EdgeInsets.only(top: 40.h, left: 16.w, right: 16.w),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: SafeArea(
-                child: Text(
-                  widget.event.title,
-                  style: TextStyle(fontSize: 28.sp),
-                ),
+          // Padding(
+          //   padding: EdgeInsets.only(top: 40.h, left: 16.w, right: 16.w),
+          //   child: Align(
+          //     alignment: Alignment.centerLeft,
+          //     child: SafeArea(
+          //       child: Text(
+          //         widget.event.title,
+          //         style: TextStyle(fontSize: 28.sp),
+          //       ),
+          //     ),
+          //   ),
+          // ),
+          Align(
+            alignment: Alignment.topLeft,
+            child: Padding(
+              padding: EdgeInsets.only(top: 60.h, left: 16.w, right: 16.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min, // avoids vertical stretching
+                children: [
+                  Text(
+                    widget.event.title,
+                    style: TextStyle(fontSize: 28.sp, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 8.h),
+                  Text(
+                    widget.appUser.isSpeaker == true
+                        ? "Welcome, Speaker!"
+                        : "Welcome, Attendee!",
+                    style: TextStyle(fontSize: 18.sp, color: Colors.grey[700]),
+                  ),
+                ],
               ),
             ),
           ),
-
           // Event Image
           EventImageWidget(event: widget.event),
-
           // Grid Items Section
           Expanded(
             child: Padding(
