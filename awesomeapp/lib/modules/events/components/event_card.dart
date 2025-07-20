@@ -12,49 +12,67 @@ class EventCard extends StatelessWidget {
   final EventModel event;
   final AppUser appUser;
   final bool showDate;
+  final VoidCallback? onTap;
 
   EventCard(
-      {required this.event, required this.showDate, required this.appUser});
+      {required this.event,
+      required this.showDate,
+      required this.appUser,
+      this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 7.h),
       child: GestureDetector(
-        onTap: () async {
-          showDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (context) => Center(
-                    child: CircularProgressIndicator(),
-                  ));
-          try {
-            final eventDetails =
-                await EventNetworking.fetchEventById(event.eventId);
-            Navigator.pop(context);
-            context.pushNamed(
-              EventDetailScreen.id,
-              extra: {
-                'event': eventDetails,
-                'appUser': appUser,
-              },
-            );
-          } catch (e) {
-            Navigator.pop(context);
-            ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Failed to load event details')));
-          }
-        },
+        onTap: onTap ??
+            () async {
+              showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (context) => Center(
+                        child: CircularProgressIndicator(),
+                      ));
+              try {
+                final eventDetails =
+                    await EventNetworking.fetchEventById(event.eventId);
+                Navigator.pop(context);
+                context.pushNamed(
+                  EventDetailScreen.id,
+                  extra: {
+                    'event': eventDetails,
+                    'appUser': appUser,
+                  },
+                );
+              } catch (e) {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Failed to load event details')));
+              }
+            },
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (showDate)
                 Padding(
-                  padding: EdgeInsets.only(left: 16.w),
-                  child: Text(
-                    event.startDate,
-                    style: TextStyle(fontSize: 14.sp),
+                  padding: EdgeInsets.symmetric(horizontal: 20.w),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        event.title,
+                        style: TextStyle(
+                            fontSize: 14.sp,
+                            // fontWeight: FontWeight.bold,
+                            color: Colors.black),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        event.startDate,
+                        style: TextStyle(fontSize: 14.sp),
+                      ),
+                    ],
                   ),
                 ),
               EventImageWidget(event: event),
