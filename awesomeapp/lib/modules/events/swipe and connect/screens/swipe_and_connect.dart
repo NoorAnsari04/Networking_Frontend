@@ -268,7 +268,7 @@ class _SwipeAndConnectScreenState extends State<SwipeAndConnectScreen> {
                                                   conferenceId:
                                                       widget.event.eventId);
                                               context.showSnackBar(
-                                                  'Rejected request');
+                                                  'User Skipped');
                                             },
                                             onConnect: () {
                                               provider.swipeAndConnectAction(
