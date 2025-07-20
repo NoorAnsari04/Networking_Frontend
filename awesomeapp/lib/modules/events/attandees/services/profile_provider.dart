@@ -26,8 +26,8 @@ class ProfileProvider with ChangeNotifier {
           _authProvider.appUser!.id, userDetails, profileImgPath ?? '');
 
       if (res) {
-        final user = AppUser.fromJson(userDetails);
-        _authProvider.updateUser(user);
+        // final user = AppUser.fromJson(userDetails);
+        // _authProvider.updateUser(user);
         print("Profile updated successfully");
         // final newToken = await _profileNetworking.refreshToken();
         // if(newToken != null){
