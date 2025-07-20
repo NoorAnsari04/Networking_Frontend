@@ -137,11 +137,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         });
       }
 
-      final success = await _profileProvider.updateProfile(context, userData, imageUrl);
+      final success = await _profileProvider.updateProfile(context, userData, _image?.path);
 
       if (success) {
         setState(() {
-          _imageUrl = imageUrl;
+          _imageUrl = _image?.path ?? _imageUrl;
         });
 
         final updatedUser = AppUser(
@@ -151,7 +151,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           email: _emailController.text,
           description: _descriptionController.text,
           linkedInUrl: _linkedinController.text,
-          imageUrl: imageUrl,
+          imageUrl: _imageUrl,
           userType: _isStudent ? 'Student' : 'Industry Person',
           degreeProgram: _isStudent ? _degreeProgramController.text : null,
           yearOfGraduation: _isStudent ? _yearOfGraduationController.text : null,
