@@ -29,12 +29,13 @@ class AuthenticationProvider with ChangeNotifier {
     _appUser = _hiveService.getUser();
   }
 
-  Future<bool> login(BuildContext context, String email, String password) async {
+  Future<bool> login(
+      BuildContext context, String email, String password) async {
     try {
       _setLoading(true);
       final AppUser? user = await _authNetworking.login(email, password);
       _setLoading(false);
-      print('User returned from login: $user');
+      // print('User returned from login: $user');
       // print('Logged in user: ${_appUser?.name}');
 
       if (user != null) {
@@ -80,7 +81,6 @@ class AuthenticationProvider with ChangeNotifier {
       return false;
     }
   }
-
 
   Future<bool> signUp(BuildContext context,
       {required String email,
@@ -195,21 +195,31 @@ class AuthenticationProvider with ChangeNotifier {
     };
   }
 
+  // Future<String?> authToken() async {
+  //   if (_appUser?.accessToken != null) {
+  //     return _appUser!.accessToken;
+  //   }
+  //   final user = await _hiveService.getUser();
+  //   if (user != null) {
+  //     _appUser = user;
+  //     return user.accessToken;
+  //   }
+  //   return null;
+  // }
   Future<String?> authToken() async {
     if (_appUser?.accessToken != null) {
       return _appUser!.accessToken;
     }
-    final user = await _hiveService.getUser();
+
+    final user = await _hiveService.getUser(); // Always fetch fresh from Hive
     if (user != null) {
-      _appUser = user;
+      _appUser = user; // Update in-memory user too
       return user.accessToken;
     }
     return null;
   }
 
-
   // return null;
-  
 
   Future<String?> getAuthToken(String refreshToken) async {
     try {
@@ -227,15 +237,15 @@ class AuthenticationProvider with ChangeNotifier {
     return null;
   }
 
-  void updateToken(String newToken){
-    if(_appUser != null ){
+  void updateToken(String newToken) {
+    if (_appUser != null) {
       _appUser!.accessToken = newToken;
       _hiveService.saveUser(_appUser!);
       notifyListeners();
     }
   }
 
-  void clear(){
+  void clear() {
     print("Authentication provider cleared");
     _appUser = null;
     _userCredential = null;
@@ -243,5 +253,12 @@ class AuthenticationProvider with ChangeNotifier {
     _hiveService.deleteUser();
     notifyListeners();
   }
-}
 
+  Future<void> loadUserFromHive() async {
+    final user = await _hiveService.getUser();
+    if(user != null ){
+      _appUser = user;
+    }
+    notifyListeners();
+  }
+}
