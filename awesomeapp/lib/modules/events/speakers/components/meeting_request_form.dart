@@ -50,9 +50,16 @@ class MeetingRequestForm extends StatelessWidget {
       children: [
         SizedBox(height: MediaQuery.of(context).size.height / 4 - 85.h),
         UserProfileAvatar(
+          name: speaker.name,
+          lastName: speaker.lastName,
           imageUrl: speaker.imageUrl,
           outerRadius: 46.w,
           innerRadius: 40.w,
+          textStyle: TextStyle(
+            fontSize: 16.sp,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 30.0),
@@ -79,22 +86,6 @@ class MeetingRequestForm extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 10.h),
-                CustomFormField(
-                  label: 'Meeting Reason',
-                  icon: SvgPicture.asset(
-                    IconConstants.titleIcon,
-                    height: 24.h,
-                  ),
-                  controller: meetingTitleController,
-                  readOnly: isViewOnly,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a meeting reason';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 16.h),
                 CustomFormField(
                   label: 'Attendee Name',
                   icon: Icon(Icons.person_outline),
@@ -144,6 +135,22 @@ class MeetingRequestForm extends StatelessWidget {
                   icon: Icon(Icons.email_outlined),
                   controller: emailController,
                   readOnly: isViewOnly,
+                ),
+                16.height,
+                CustomFormField(
+                  label: 'Meeting Reason',
+                  icon: SvgPicture.asset(
+                    IconConstants.titleIcon,
+                    height: 20.h,
+                  ),
+                  controller: meetingTitleController,
+                  readOnly: isViewOnly,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a meeting reason';
+                    }
+                    return null;
+                  },
                 ),
                 16.height,
                 if (!isViewOnly)
