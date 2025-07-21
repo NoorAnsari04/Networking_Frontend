@@ -96,30 +96,27 @@ class _MeetingRequestScreenState extends State<MeetingRequestScreen> {
   void _submitForm() async {
     if (_formKey.currentState!.validate()) {
       try {
-        final currentUserId = _authProvider.appUser!.id;
         final speakerId = widget.speaker.id;
+        final conferenceId = _authProvider.appUser?.conferenceId?.isNotEmpty == true
+            ? _authProvider.appUser!.conferenceId?.first
+            : null;
 
-        final request = MeetingRequest(
-          senderId: currentUserId,
+
+        if (conferenceId == null) {
+          context.showSnackBar("Conference ID is missing.");
+          return;
+        }
+
+        await _speakerProvider.createMeetingRequest(
           receiverId: speakerId,
-          meetingTitle: _meetingTitleController.text,
-          attendeeName: _attendeeNameController.text,
-          company: _isStudentRequest ? null : _companyController.text,
-          position: _isStudentRequest ? null : _positionController.text,
-          university: _isStudentRequest ? _universityController.text : null,
-          degreeProgram:
-              _isStudentRequest ? _degreeProgramController.text : null,
-          email: _emailController.text,
+          conferenceId: conferenceId,
         );
 
-        await _speakerProvider.createMeetingRequest(request);
-
         context.showSnackBar('Meeting request sent successfully!');
-
         Navigator.of(context).pop();
       } catch (e) {
-        context
-            .showSnackBar('Failed to send meeting request. Please try again.');
+        print("Error: $e");
+        context.showSnackBar('Failed to send meeting request. Please try again.');
       }
     }
   }
