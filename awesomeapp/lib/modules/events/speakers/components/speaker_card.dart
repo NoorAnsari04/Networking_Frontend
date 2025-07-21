@@ -44,8 +44,12 @@ class SpeakerCard extends StatelessWidget {
             child: Center(
               child: UserProfileAvatar(
                 imageUrl: speaker.imageUrl,
+                name: speaker.name,
+                lastName: speaker.lastName,
                 outerRadius: 85.w,
                 innerRadius: 75.w,
+                textStyle: TextStyle(
+                    fontSize: 26.sp, fontWeight: FontWeight.bold, color: Colors.white),
               ),
             ),
           ),
