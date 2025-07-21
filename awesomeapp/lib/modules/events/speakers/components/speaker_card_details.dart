@@ -42,7 +42,9 @@ class SpeakerCardDetails extends StatelessWidget {
                 width: 8,
               ),
               Text(
-                speaker.company!,
+                speaker.userType == 'Student'
+                    ? (speaker.instituteName ?? 'Institute not available')
+                    : (speaker.company ?? 'Company not available'),
                 style: TextStyle(
                   fontSize: 16.sp,
                   color: ColorConstants.company,
@@ -53,7 +55,9 @@ class SpeakerCardDetails extends StatelessWidget {
         ),
         8.height,
         Text(
-          speaker.position!,
+          (speaker.position == null || speaker.position!.trim().isEmpty)
+              ? 'Student'
+              : speaker.position!,
           style: TextStyle(
             fontSize: 14.sp,
             color: ColorConstants.company,
