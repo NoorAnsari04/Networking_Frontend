@@ -26,6 +26,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _lastNameController = TextEditingController();
+
   // final _phNumberController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -44,25 +45,30 @@ class _SignupScreenState extends State<SignupScreen> {
 
   Future<void> _handleSignUp() async {
     if (_formKey.currentState!.validate()) {
+      await FirebaseAuth.instance.signOut();
       final success =
-          await Provider.of<AuthenticationProvider>(context, listen: false)
-              .signUp( context,email:_emailController.text, password: _passwordController.text, firstName: _nameController.text, lastName: _lastNameController.text, confirmPassword:_confirmPasswordController.text);
+      await Provider.of<AuthenticationProvider>(context, listen: false)
+          .signUp(context, email: _emailController.text,
+          password: _passwordController.text,
+          firstName: _nameController.text,
+          lastName: _lastNameController.text,
+          confirmPassword: _confirmPasswordController.text);
 
       if (success) {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => UserDetailsScreen(
-              signupData: {
-                'email': _emailController.text,
-                'name': _nameController.text,
-                'lastName': _lastNameController.text,
-                // 'phNumber': _phNumberController.text,
-                'password': _passwordController.text,
-                'confirmPassword': _confirmPasswordController.text
-                
-              },
-            ),
+            builder: (context) =>
+                UserDetailsScreen(
+                  signupData: {
+                    'email': _emailController.text,
+                    'name': _nameController.text,
+                    'lastName': _lastNameController.text,
+                    // 'phNumber': _phNumberController.text,
+                    'password': _passwordController.text,
+                    'confirmPassword': _confirmPasswordController.text
+                  },
+                ),
           ),
         );
       } else {
@@ -73,31 +79,50 @@ class _SignupScreenState extends State<SignupScreen> {
 
   Future<void> _handleGoogleSignIn() async {
     final authProc =
-        Provider.of<AuthenticationProvider>(context, listen: false);
-    final success = await authProc.googleSignIn();
+    Provider.of<AuthenticationProvider>(context, listen: false);
+    final success = await authProc.googleSignIn(context);
     if (!mounted) return;
 
-    if (success) {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        // Check if the user document already exists
-        final documentExists = await authProc.isUserDocumentExist();
-
-        if (documentExists) {
-          // If the document exists, go directly to the HomeScreen
-          context.goNamed(HomeScreen.id);
-        } else {
-          // If the document doesn't exist, prepare signupData and go to UserDetailsScreen
-          final signupData = {
-            'email': user.email,
-            'name': user.displayName,
-            'imageUrl': user.photoURL,
-          };
-
-          context.goNamed(UserDetailsScreen.id,
-              extra: {'signupData': signupData, 'isGoogleSignIn': true});
-        }
+    if (success != null && success['firebaseUser'] != null) {
+      final isNewUser = success['isNewUser'] == true;
+      if (isNewUser) {
+        final user = FirebaseAuth.instance.currentUser;
+        final signupData = {
+          'email': user?.email,
+          'name': user?.displayName,
+          'imageUrl': user?.photoURL
+        };
+        context.goNamed(UserDetailsScreen.id, extra:
+          {'signupData': signupData, 'isGoogleSignIn': true},
+        );
+      } else {
+        context.goNamed(HomeScreen.id);
       }
+      // final user = FirebaseAuth.instance.currentUser;
+      // if (user != null) {
+      //   final idToken = await user. getIdToken();
+      //   print("IdToken: $idToken");
+      //   // Check if the user document already exists
+      //   final documentExists = await authProc.isUserDocumentExist();
+      //
+      //   if (documentExists) {
+      //     // If the document exists, go directly to the HomeScreen
+      //     context.goNamed(HomeScreen.id);
+      //   } else {
+      //     // If the document doesn't exist, prepare signupData and go to UserDetailsScreen
+      //     final signupData = {
+      //       'email': user.email,
+      //       'name': user.displayName,
+      //       'imageUrl': user.photoURL,
+      //     };
+      //
+      //     context.goNamed(UserDetailsScreen.id,
+      //         extra: {'signupData': signupData, 'isGoogleSignIn': true});
+      //   }
+      // }
+      // if (user != null) {
+      //   context.goNamed(HomeScreen.id);
+      // }
     } else {
       context.showSnackBar('Google Login Failed');
     }
@@ -109,7 +134,9 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isLoading = Provider.of<AuthenticationProvider>(context).isLoading;
+    final isLoading = Provider
+        .of<AuthenticationProvider>(context)
+        .isLoading;
 
     return Scaffold(
       body: Stack(
@@ -152,7 +179,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         emailController: _emailController,
                         passwordController: _passwordController,
                         confirmPasswordController: _confirmPasswordController,
-                        
+
 
                         onSignup: _handleSignUp,
                       ),
