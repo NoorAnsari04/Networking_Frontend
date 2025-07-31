@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/services/hive_services.dart';
 import 'auth_networking.dart';
@@ -29,8 +30,7 @@ class AuthenticationProvider with ChangeNotifier {
     _appUser = _hiveService.getUser();
   }
 
-  Future<bool> login(
-      BuildContext context, String email, String password) async {
+  Future<bool> login(BuildContext context, String email, String password) async {
     try {
       _setLoading(true);
       final AppUser? user = await _authNetworking.login(email, password);
@@ -63,7 +63,9 @@ class AuthenticationProvider with ChangeNotifier {
       _setLoading(true);
 
       // Optional: Call your backend logout API (if implemented)
-      final bool result = await _authNetworking.signOut();
+      await FirebaseAuth.instance.signOut();
+      await GoogleSignIn().signOut();
+      await _authNetworking.signOut();
 
       // Clear local user data regardless of backend result
       _appUser = null;
@@ -74,7 +76,7 @@ class AuthenticationProvider with ChangeNotifier {
       notifyListeners();
 
       print("Sign out successful");
-      return result;
+      return true;
     } catch (e) {
       _setLoading(false);
       print("Error during sign out: $e");
@@ -135,22 +137,22 @@ class AuthenticationProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> googleSignIn(BuildContext context) async {
+  Future<Map <String, dynamic>?> googleSignIn(BuildContext context) async {
     _setLoading(true);
     final user = await _socialNetworking.signInWithGoogle();
     _setLoading(false);
 
     if (user != null) {
       // Check if user document exists
-      final appUser = user['appUser'] as AppUser;
+      final appUser = user['appuser'] as AppUser;
       final firebaseUser = user['firebaseUser'];
       final token = user['token'];
       _appUser = appUser;
       _hiveService.saveUser(_appUser!);
       notifyListeners();
-      return true;
+      return user;
     }
-    return false;
+    return null;
   }
 
   Future<bool> isUserDocumentExist() async {
@@ -172,8 +174,7 @@ class AuthenticationProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  static Future<void> saveUserCredentials(
-      String email, String password, bool rememberMe) async {
+  static Future<void> saveUserCredentials(String email, String password, bool rememberMe) async {
     final prefs = await SharedPreferences.getInstance();
     if (rememberMe) {
       await prefs.setString('email', email);
@@ -256,7 +257,7 @@ class AuthenticationProvider with ChangeNotifier {
 
   Future<void> loadUserFromHive() async {
     final user = await _hiveService.getUser();
-    if(user != null ){
+    if (user != null) {
       _appUser = user;
     }
     notifyListeners();
