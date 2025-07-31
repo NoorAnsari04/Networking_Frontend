@@ -83,11 +83,18 @@ class SpeakerNetworking {
       final dioInstance = DioClient.getDioInstance();
       final currentUserId = _auth.currentUser?.uid ?? '';
       print("currentUserId: $currentUserId");
+      final token = await serviceLocator<AuthenticationProvider>().authToken();
 
       // Make the API call
-      final response = await dioInstance.get(url, queryParameters: {
-        'userId': currentUserId,
-      });
+      final response = await dioInstance.get(
+        url,
+        queryParameters: {
+          'userId': currentUserId,
+        },
+        options: Options(headers: {
+          "Authorization": "Bearer $token",
+        }),
+      );
 
       // Check if the API call was successful
       if (response.statusCode != 200) {
@@ -172,15 +179,22 @@ class SpeakerNetworking {
     required String senderId,
     required String receiverId,
     required String action,
-    }) async {
+  }) async {
     try {
       final dioInstance = DioClient.getDioInstance();
       final url = ApiConstants.baseUrl + ApiConstants.handleConnectionRequests;
+      final token = await serviceLocator<AuthenticationProvider>().authToken();
 
-      final response = await dioInstance.put(url, data: {
-        'requestId': requestId,
-        'action': action,
-      });
+      final response = await dioInstance.put(url,
+          data: {
+            'requestId': requestId,
+            'action': action,
+          },
+          options: dio.Options(
+            headers: {
+              "Authorization": "Bearer $token",
+            },
+          ));
 
       if (response.statusCode != 200) {
         throw Exception(
@@ -193,13 +207,13 @@ class SpeakerNetworking {
             responseData['message'] ?? "Failed to handle meeting request");
       }
 
-      if (action == 'Approve') {
-        await _firestore.collection('connections').add({
-          'accepted': receiverId,
-          'sent': senderId,
-          'date': Timestamp.now(),
-        });
-      }
+      // if (action == 'Approve') {
+      //   await _firestore.collection('connections').add({
+      //     'accepted': receiverId,
+      //     'sent': senderId,
+      //     'date': Timestamp.now(),
+      //   });
+      // }
     } catch (e) {
       print("Error handling meeting request: $e");
       throw e;
@@ -208,22 +222,48 @@ class SpeakerNetworking {
 
   Future<String> getRequestStatus(String receiverId) async {
     try {
-      final currentUserId = _auth.currentUser?.uid ?? '';
-
-      QuerySnapshot requestSnapshot = await FirebaseFirestore.instance
-          .collection('meeting_requests')
-          .where(Filter.or(
-              Filter.and(Filter('senderId', isEqualTo: currentUserId),
-                  Filter('receiverId', isEqualTo: receiverId)),
-              Filter.and(Filter('senderId', isEqualTo: receiverId),
-                  Filter('receiverId', isEqualTo: currentUserId))))
-          .get();
-
-      if (requestSnapshot.docs.isNotEmpty) {
-        final request =
-            requestSnapshot.docs.first.data() as Map<String, dynamic>;
-        return request['status'];
+      final authProvider = serviceLocator<AuthenticationProvider>();
+      final currentUserId = authProvider.appUser?.id;
+      if (currentUserId == null || currentUserId.isEmpty) {
+        print("❌ currentUserId is null or empty");
+        return 'error';
       }
+
+      // QuerySnapshot requestSnapshot = await FirebaseFirestore.instance
+      //     .collection('meeting_requests')
+      //     .where(Filter.or(
+      //         Filter.and(Filter('senderId', isEqualTo: currentUserId),
+      //             Filter('receiverId', isEqualTo: receiverId)),
+      //         Filter.and(Filter('senderId', isEqualTo: receiverId),
+      //             Filter('receiverId', isEqualTo: currentUserId))))
+      //     .get();
+      //
+      // if (requestSnapshot.docs.isNotEmpty) {
+      //   final request =
+      //       requestSnapshot.docs.first.data() as Map<String, dynamic>;
+      //   return request['status'];
+      // }
+      //
+      // return 'none';
+      final token = await serviceLocator<AuthenticationProvider>().authToken();
+      final dioInstance = DioClient.getDioInstance();
+      // final authProvider = serviceLocator<AuthenticationProvider>();
+      final conferenceId = authProvider.appUser?.conferenceId?.first ?? '';
+
+      final url = ApiConstants.baseUrl + ApiConstants.getRequestStatus;
+      final response = await dioInstance.get(url,
+          queryParameters: {
+            'userId': currentUserId,
+            'receiverId': receiverId,
+            'conferenceId': conferenceId
+          },
+          options: dio.Options(headers: {
+            "Authorization": "Bearer $token",
+          }));
+      if (response.statusCode == 200 && response.data['success']) {
+        return response.data['data']['status'] ?? 'none';
+      }
+      ;
 
       return 'none';
     } catch (e) {
@@ -232,35 +272,27 @@ class SpeakerNetworking {
     }
   }
 
-  Future<void>  createMeetingRequest({required String receiverId, required String conferenceId}) async {
-    try{
+  Future<void> createMeetingRequest(
+      {required String receiverId, required String conferenceId}) async {
+    try {
       final dioInstance = DioClient.getDioInstance();
       final url = ApiConstants.baseUrl + ApiConstants.connectSpeakers;
 
       final token = await serviceLocator<AuthenticationProvider>().authToken();
-      final response = await dioInstance.post(
-        url,
-        data:{
-          'receiverId': receiverId,
-          'conferenceId': conferenceId
-        },
-        options: dio.Options(
-          headers:{
-            "Authorization": "Bearer $token"
-          }
-        )
-      );
+      final response = await dioInstance.post(url,
+          data: {'receiverId': receiverId, 'conferenceId': conferenceId},
+          options: dio.Options(headers: {"Authorization": "Bearer $token"}));
       print("Create meeting request response: ${response.data}");
-      if (response.statusCode == 200 && response.data != null){
+      if (response.statusCode == 200 && response.data != null) {
         final Map<String, dynamic> responseData = response.data;
-        if (!(responseData['success'] ?? false )) {
-          throw Exception(responseData['message']?? "Meeting request failed");
+        if (!(responseData['success'] ?? false)) {
+          throw Exception(responseData['message'] ?? "Meeting request failed");
         }
         print("Meeting request created: ${responseData['message']}");
       } else {
         throw Exception("Failed to create meeting request");
       }
-    } catch (e){
+    } catch (e) {
       print("Error creating meeting request: $e");
       throw Exception('Failed to create meeting request: $e');
     }
