@@ -1,14 +1,17 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import '../../../core/serviceLocator.dart';
+import '../../../core/services/hive_services.dart';
 import 'app_user.dart';
 import 'auth_networking.dart';
 import 'package:dio/dio.dart';
 import '../../../core/constants/api_constants.dart';
+import 'auth_provider.dart';
 
 class SocialNetworking {
   final AuthNetworking _authNetworking = AuthNetworking();
 
-  Future<User?> signInWithGoogle() async {
+  Future<Map<String, dynamic>?> signInWithGoogle() async {
     try {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
       final GoogleSignInAuthentication? googleAuth =
@@ -27,7 +30,9 @@ class SocialNetworking {
       final userCredential =
           await FirebaseAuth.instance.signInWithCredential(credential);
 
-      final idToken = googleAuth.idToken;
+      final idToken = await userCredential.user?.getIdToken();
+
+      print('Google ID Token: $idToken');
 
       if (idToken != null) {
         final dio = Dio();
@@ -43,9 +48,25 @@ class SocialNetworking {
 
         if (response.statusCode == 200) {
           final userData = response.data['data']['user'];
+          final isNewUser = response.data['data']['isNewUser'] ?? false;
+          final token = response.data['data']['accessToken'];
+          if (token == null) {
+            print('Token is missing!');
+            return null;
+          }
+          final appUser = AppUser.fromJson({...userData, 'id':userData['_id']});
           print('User signed up successfully: $userData');
+          final authProvider = serviceLocator<AuthenticationProvider>();
+          authProvider.updateUser(appUser);
+          authProvider.updateToken(token);
+          await HiveService().saveUser(appUser);
 
-          return FirebaseAuth.instance.currentUser;
+          return {
+            'firebaseUser': FirebaseAuth.instance.currentUser,
+            'appuser': appUser,
+            'token': token,
+            'isNewUser': isNewUser
+          };
         } else {
           print(
               'Backend response error (status: ${response.statusCode}): ${response.data}');
