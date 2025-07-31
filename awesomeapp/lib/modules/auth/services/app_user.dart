@@ -93,7 +93,8 @@ class AppUser {
     this.refreshToken,
     this.score = 0,
     this.isSpeaker,
-    this.conferenceId
+    this.conferenceId,
+
   });
 
   factory AppUser.fromJson(Map<String, dynamic> jsonUser) {
@@ -182,6 +183,7 @@ class AppUser {
     List<String>? interests,
     String? accessToken,
     String? refreshToken,
+    List<String>? conferenceId,
     int?score,
 
   }) {
@@ -206,6 +208,38 @@ class AppUser {
       accessToken: accessToken ?? this.accessToken,
       refreshToken: refreshToken ?? this.refreshToken,
       score: score ?? this.score,
+      conferenceId: conferenceId ?? this.conferenceId,
     );
   }
+
+  @override
+  String toString() {
+    return '''
+AppUser {
+  id: $id,
+  name: $name,
+  lastName: $lastName,
+  email: $email,
+  imageUrl: $imageUrl,
+  company: $company,
+  position: $position,
+  sessionsDeliver: $sessionsDeliver,
+  description: $description,
+  yearsOfExperience: $yearsOfExperience,
+  linkedInUrl: $linkedInUrl,
+  degreeProgram: $degreeProgram,
+  yearOfGraduation: $yearOfGraduation,
+  instituteName: $instituteName,
+  accessToken: $accessToken,
+  refreshToken: $refreshToken,
+  isReceivedRequest: $isReceivedRequest,
+  userType: $userType,
+  isSpeaker: $isSpeaker,
+  conferenceId: $conferenceId,
+  interests: $interests,
+  interestNames: $interestNames,
+  score: $score
+}''';
+  }
+
 }
