@@ -1,6 +1,7 @@
 // connected_profiles.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:my_test_app_flavors/core/extensions/extension.dart';
 import 'package:my_test_app_flavors/modules/components/connection_card.dart';
 import 'package:my_test_app_flavors/modules/components/connection_card_details.dart';
@@ -25,9 +26,21 @@ class ConnectedProfiles extends StatelessWidget {
             height: MediaQuery.of(context).size.height / 2,
             color: ColorConstants.primaryColor,
           ),
-          CustomAppBar(
-            title: 'Connected',
-            iconPath: IconConstants.backward_arrow,
+          // CustomAppBar(
+          //   title: 'Connected',
+          //   iconPath: IconConstants.backward_arrow,
+          // ),
+          Positioned(
+            top: 50.h, // adjust if needed based on your status bar height
+            left: 16.w,
+            child: GestureDetector(
+              onTap: () => Navigator.of(context).pop(),
+              child: SvgPicture.asset(
+                'assets/arrow_icon.svg',
+                height: 30.h,
+                width: 15.w,
+              ),
+            ),
           ),
           Center(
             child: Padding(
