@@ -5,6 +5,7 @@ import 'package:my_test_app_flavors/modules/events/screens/ticket_screen.dart';
 import 'package:my_test_app_flavors/modules/events/speakers/screens/meeting_request_screen.dart';
 import 'package:my_test_app_flavors/modules/events/speakers/screens/speaker_profile.dart';
 import 'package:my_test_app_flavors/modules/events/speakers/screens/speakers_screen.dart';
+import 'package:my_test_app_flavors/modules/screens/terms_and_conditions.dart';
 import 'package:provider/provider.dart';
 import '../../modules/auth/screens/forget_password_screen.dart';
 import '../../modules/auth/screens/login_screen.dart';
@@ -13,6 +14,7 @@ import '../../modules/auth/screens/user_details_screen.dart';
 import '../../modules/auth/services/app_user.dart';
 import '../../modules/auth/services/auth_provider.dart';
 import '../../modules/events/attandees/screens/edit_profile_screen.dart';
+import '../../modules/events/screens/agenda_screen.dart';
 import '../../modules/events/screens/event_detail_screen.dart';
 import '../../modules/events/swipe and connect/screens/perferences_screen.dart';
 import '../../modules/events/swipe and connect/screens/swipe_and_connect.dart';
@@ -34,18 +36,18 @@ class AppRoutes {
       GlobalKey<NavigatorState>(debugLabel: 'shellE');
 
   static final router = GoRouter(
-    initialLocation: '/${SignupScreen.id}',
+    initialLocation: '/${LoginScreen.id}',
     navigatorKey: rootNavigatorKey,
     routes: [
       GoRoute(
         name: SignupScreen.id,
         path: '/${SignupScreen.id}',
         builder: (context, state) => SignupScreen(),
-        redirect: (context, state) {
-          final authProv =
-              Provider.of<AuthenticationProvider>(context, listen: false);
-          return authProv.appUser != null ? '/${HomeScreen.id}' : null;
-        },
+        // redirect: (context, state) {
+        //   final authProv =
+        //       Provider.of<AuthenticationProvider>(context, listen: false);
+        //   return authProv.appUser != null ? '/${HomeScreen.id}' : null;
+        // },
       ),
       GoRoute(
         path: '/${UserDetailsScreen.id}',
@@ -64,6 +66,17 @@ class AppRoutes {
         path: '/${LoginScreen.id}',
         name: LoginScreen.id,
         builder: (context, state) => LoginScreen(),
+        redirect: (context, state) {
+          final auth =
+              Provider.of<AuthenticationProvider>(context, listen: false);
+          final loggedIn = auth.isLoggedIn;
+
+          if (loggedIn) {
+            return '/${HomeScreen.id}';
+          }
+
+          return null;
+        },
         routes: [
           GoRoute(
             path: ForgetPasswordPage.id,
@@ -77,6 +90,14 @@ class AppRoutes {
         path: '/${EventDetailScreen.id}',
         pageBuilder: (context, state) {
           final args = state.extra as Map<String, dynamic>;
+          if (args == null ||
+              args['event'] == null ||
+              args['appUser'] == null) {
+            return const MaterialPage(
+              child: Scaffold(
+                  body: Center(child: Text("Missing event or user info"))),
+            );
+          }
           final event = args['event'] as EventModel;
           final appUser = args['appUser'] as AppUser;
           return MaterialPage(
@@ -115,6 +136,13 @@ class AppRoutes {
             builder: (context, state) {
               final Map<String, dynamic> args =
                   state.extra as Map<String, dynamic>;
+              if (args == null ||
+                  args['appUser'] == null ||
+                  args['eventModel'] == null) {
+                return const Scaffold(
+                  body: Center(child: Text("Missing ticket screen arguments")),
+                );
+              }
               final AppUser appUser = args['appUser'];
               final EventModel eventModel = args['eventModel'];
               return TicketScreen(
@@ -153,6 +181,19 @@ class AppRoutes {
         path: '/${ContactSupport.id}',
         name: ContactSupport.id,
         builder: (context, state) => ContactSupport(),
+      ),
+      GoRoute(
+        path: '/terms',
+        name: TermsAndConditions.id,
+        builder: (context, state) => TermsAndConditions(),
+      ),
+      GoRoute(
+        path: '/agenda',
+        name: AgendaScreen.id,
+        builder: (context, state) {
+          final imageUrl = state.extra as String;
+          return AgendaScreen(imageUrl: imageUrl);
+        },
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
