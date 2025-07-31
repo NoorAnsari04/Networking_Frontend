@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:my_test_app_flavors/core/extensions/scaffold_message.dart';
+import 'package:my_test_app_flavors/modules/auth/services/auth_provider.dart';
 import 'package:my_test_app_flavors/modules/events/speakers/components/speaker_listTile.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/constants/icon_constants.dart';
@@ -25,6 +27,9 @@ class _SpeakersScreenState extends State<SpeakersScreen> {
   @override
   void initState() {
     super.initState();
+    final authProvider =
+        Provider.of<AuthenticationProvider>(context, listen: false);
+    _isCurrentUserSpeaker = authProvider.appUser?.isSpeaker ?? false;
     _searchController.addListener(_filterSpeakers); // Add listener
   }
 
@@ -35,21 +40,37 @@ class _SpeakersScreenState extends State<SpeakersScreen> {
     super.dispose();
   }
 
+  // void _filterSpeakers() {
+  //   final query = _searchController.text.toLowerCase();
+  //   final speakerProv = Provider.of<SpeakerProvider>(context, listen: false);
+  //   setState(() {
+  //     _filteredSpeakers = speakerProv.speakers
+  //         .where((speaker) =>
+  //             speaker.fullName.toLowerCase().contains(query) ||
+  //             speaker.position?.toLowerCase().contains(query) == true ||
+  //             speaker.company?.toLowerCase().contains(query) == true)
+  //         .toList();
+  //   });
+  // }
   void _filterSpeakers() {
     final query = _searchController.text.toLowerCase();
     final speakerProv = Provider.of<SpeakerProvider>(context, listen: false);
+    final authProvider =
+        Provider.of<AuthenticationProvider>(context, listen: false);
+    final currentUserId = authProvider.appUser?.id;
+
     setState(() {
       _filteredSpeakers = speakerProv.speakers
           .where((speaker) =>
-              speaker.fullName.toLowerCase().contains(query) ||
-              speaker.position?.toLowerCase().contains(query) == true ||
-              speaker.company?.toLowerCase().contains(query) == true)
+              speaker.id != currentUserId &&
+              (speaker.fullName.toLowerCase().contains(query) ||
+                  speaker.position?.toLowerCase().contains(query) == true ||
+                  speaker.company?.toLowerCase().contains(query) == true))
           .toList();
     });
   }
 
-  Widget _buildTrailingButton(
-      AppUser speaker, SpeakerProvider speakerProvider) {
+  Widget _buildTrailingButton(AppUser speaker, SpeakerProvider speakerProvider) {
     // todo use Consumer instead if FutureBuilder and getRequestStatus on init state
     return FutureBuilder<String>(
       future: speakerProvider.getRequestStatus(speaker.id),
@@ -75,19 +96,26 @@ class _SpeakersScreenState extends State<SpeakersScreen> {
             return ElevatedButton(
               onPressed: () async {
                 final currentUserId = speakerProvider.getCurrentUserId() ?? '';
+                final authProvider = Provider.of<AuthenticationProvider>(context, listen: false);
+                final conferenceId = authProvider.appUser?.conferenceId?.isNotEmpty == true
+                    ? authProvider.appUser!.conferenceId!.first
+                    : null;
 
+                if (conferenceId == null) {
+                  context.showSnackBar("Conference ID is missing.");
+                  return;
+                }
                 if (_isCurrentUserSpeaker) {
-                  final request = MeetingRequest(
-                    senderId: currentUserId,
+                  await speakerProvider.createMeetingRequest(
                     receiverId: speaker.id,
-                    status: 'pending',
-                    timestamp: DateTime.now(),
+                    conferenceId: conferenceId,
                   );
-                  await speakerProvider.createMeetingRequest(request);
+
+                  setState(() {});
+
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                        content: Text(
-                            'Connection request sent to ${speaker.fullName}')),
+                        content: Text('Connection request sent to ${speaker.fullName}')),
                   );
                 } else {
                   context.pushNamed(
@@ -102,6 +130,150 @@ class _SpeakersScreenState extends State<SpeakersScreen> {
       },
     );
   }
+
+  // Widget _buildTrailingButton(
+  //     AppUser speaker, SpeakerProvider speakerProvider) {
+  //   return StatefulBuilder(
+  //     builder: (context, setLocalState) {
+  //       Future<String> _statusFuture =
+  //           speakerProvider.getRequestStatus(speaker.id);
+  //
+  //       return FutureBuilder<String>(
+  //         future: _statusFuture,
+  //         builder: (context, snapshot) {
+  //           if (snapshot.connectionState == ConnectionState.waiting) {
+  //             return CircularProgressIndicator();
+  //           }
+  //
+  //           String status = snapshot.data ?? 'none';
+  //
+  //           switch (status) {
+  //             case 'pending':
+  //               return ElevatedButton(
+  //                 onPressed: null,
+  //                 child: Text('Pending'),
+  //               );
+  //             case 'accepted':
+  //               return ElevatedButton(
+  //                 onPressed: null,
+  //                 child: Text('Accepted'),
+  //               );
+  //             default:
+  //               return ElevatedButton(
+  //                 onPressed: () async {
+  //                   final currentUserId =
+  //                       speakerProvider.getCurrentUserId() ?? '';
+  //                   final authProvider = Provider.of<AuthenticationProvider>(
+  //                       context,
+  //                       listen: false);
+  //                   final conferenceId =
+  //                       authProvider.appUser?.conferenceId?.isNotEmpty == true
+  //                           ? authProvider.appUser!.conferenceId!.first
+  //                           : null;
+  //
+  //                   if (conferenceId == null) {
+  //                     context.showSnackBar("Conference ID is missing.");
+  //                     return;
+  //                   }
+  //
+  //                   if (_isCurrentUserSpeaker) {
+  //                     await speakerProvider.createMeetingRequest(
+  //                       receiverId: speaker.id,
+  //                       conferenceId: conferenceId,
+  //                     );
+  //
+  //                     // Trigger UI update after request creation
+  //                     setLocalState(() {});
+  //                     ScaffoldMessenger.of(context).showSnackBar(
+  //                       SnackBar(
+  //                           content: Text(
+  //                               'Connection request sent to ${speaker.fullName}')),
+  //                     );
+  //                   } else {
+  //                     context.pushNamed(
+  //                       MeetingRequestScreen.id,
+  //                       extra: {'speaker': speaker},
+  //                     );
+  //                   }
+  //                 },
+  //                 child: Text(_isCurrentUserSpeaker ? 'Connect' : 'Request'),
+  //               );
+  //           }
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
+
+  // Widget _buildTrailingButton(AppUser speaker, SpeakerProvider speakerProvider) {
+  //   return StatefulBuilder(
+  //     builder: (context, setLocalState) {
+  //       String status = 'loading';
+  //
+  //       void fetchStatus() async {
+  //         final result = await speakerProvider.getRequestStatus(speaker.id);
+  //         setLocalState(() {
+  //           status = result;
+  //         });
+  //       }
+  //
+  //       // fetch status only once
+  //       if (status == 'loading') {
+  //         fetchStatus();
+  //         return CircularProgressIndicator();
+  //       }
+  //
+  //       if (status == 'pending') {
+  //         return ElevatedButton(
+  //           onPressed: null,
+  //           child: const Text('Pending'),
+  //         );
+  //       } else if (status == 'accepted') {
+  //         return ElevatedButton(
+  //           onPressed: null,
+  //           child: const Text('Accepted'),
+  //         );
+  //       } else {
+  //         return ElevatedButton(
+  //           onPressed: () async {
+  //             final authProvider = Provider.of<AuthenticationProvider>(context, listen: false);
+  //             final conferenceId = authProvider.appUser?.conferenceId?.isNotEmpty == true
+  //                 ? authProvider.appUser!.conferenceId!.first
+  //                 : null;
+  //
+  //             if (conferenceId == null) {
+  //               context.showSnackBar("Conference ID is missing.");
+  //               return;
+  //             }
+  //
+  //             if (_isCurrentUserSpeaker) {
+  //               await speakerProvider.createMeetingRequest(
+  //                 receiverId: speaker.id,
+  //                 conferenceId: conferenceId,
+  //               );
+  //
+  //               // 🔄 Immediately reflect the new status
+  //               setLocalState(() {
+  //                 status = 'pending';
+  //               });
+  //
+  //               ScaffoldMessenger.of(context).showSnackBar(
+  //                 SnackBar(content: Text('Connection request sent to ${speaker.fullName}')),
+  //               );
+  //             } else {
+  //               context.pushNamed(
+  //                 MeetingRequestScreen.id,
+  //                 extra: {'speaker': speaker},
+  //               );
+  //             }
+  //           },
+  //           child: Text(_isCurrentUserSpeaker ? 'Connect' : 'Request'),
+  //         );
+  //       }
+  //     },
+  //   );
+  // }
+
 
   @override
   Widget build(BuildContext context) {
@@ -131,6 +303,9 @@ class _SpeakersScreenState extends State<SpeakersScreen> {
           Expanded(
             child: Consumer<SpeakerProvider>(
               builder: (context, speakerProvider, child) {
+                final authProvider =
+                    Provider.of<AuthenticationProvider>(context, listen: false);
+                final currentUserId = authProvider.appUser?.id;
                 if (speakerProvider.isLoading) {
                   return Center(child: CircularProgressIndicator());
                 }
@@ -140,6 +315,8 @@ class _SpeakersScreenState extends State<SpeakersScreen> {
                 final speakersToShow =
                     _filteredSpeakers.isEmpty && _searchController.text.isEmpty
                         ? speakerProvider.speakers
+                            .where((s) => s.id != currentUserId)
+                            .toList()
                         : _filteredSpeakers;
                 return ListView.builder(
                   itemCount: speakersToShow.length,
