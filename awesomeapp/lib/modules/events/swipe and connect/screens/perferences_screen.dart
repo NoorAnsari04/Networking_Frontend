@@ -18,7 +18,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
   String? selectedIndustry;
   TextEditingController reasonController = TextEditingController();
 
-  List<String> professions = [
+  List<String> professions  = [
     'Flutter Developer',
     'ReactJs Developer',
     'UX/UI Designer',
@@ -35,7 +35,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
     'Data Scientist'
   ];
 
-  List<String> industries = [
+  List<String> industries  = [
     'AI',
     'Design',
     'Devops',
@@ -61,9 +61,9 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // SizedBox(height: 20.h),
-                 CustomAppBar(
-                  title: 'Advance Filters',
-                  iconPath: IconConstants.backward_arrow,
+              CustomAppBar(
+                title: 'Advance Filters',
+                iconPath: IconConstants.backward_arrow,
               ),
               SizedBox(height: 40.h),
               // UserTypeSelection(
@@ -75,14 +75,16 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
               //   },
               //   title: 'Whom do you want to connect with?',
               // ),
-              Text("Whom do you want to connect with?", style: TextStyle(fontSize: 16.sp),),
-              SizedBox(height: 8  .h),
+              Text(
+                "Whom do you want to connect with?",
+                style: TextStyle(fontSize: 16.sp),
+              ),
+              SizedBox(height: 8.h),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 12.w),
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius:   BorderRadius.circular(5)
-                ),
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(5)),
                 child: DropdownButton<String>(
                   value: userType,
                   isExpanded: true,
@@ -106,8 +108,8 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
                 Text('Designation:', style: TextStyle(fontSize: 16.sp)),
                 Container(
                   decoration: BoxDecoration(
-                  border:Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(5),
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(5),
                   ),
                   child: DropdownButton<String>(
                     value: selectedProfession,
@@ -118,7 +120,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
                         child: Text(profession),
                       );
                     }).toList(),
-                    onChanged: (String? newValue){
+                    onChanged: (String? newValue) {
                       setState(() {
                         selectedProfession = newValue;
                       });
@@ -136,7 +138,8 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
                 child: DropdownButton<String>(
                   value: selectedIndustry,
                   isExpanded: true,
-                  items: industries.map((String industry) {
+                  items: industries
+                      .map((String industry) {
                     return DropdownMenuItem<String>(
                       value: industry,
                       child: Text(industry),
@@ -155,7 +158,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
               Center(
                 child: CustomElevatedButton(
                   onPressed: () {
-                    Navigator.pop(context,{
+                    Navigator.pop(context, {
                       'profession': selectedProfession,
                       'industry': selectedIndustry,
                     });
