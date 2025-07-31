@@ -42,7 +42,7 @@ class _ConnectionRequestsContentState extends State<ConnectionRequestsContent> {
         preferredSize: Size.fromHeight(kToolbarHeight),
         child: CustomAppBar(
           title: 'Pending Requests',
-          iconPath: IconConstants.backward_arrow,
+          iconPath: 'assets/arrow_icon.svg',
         ),
       ),
       body: Consumer<SpeakerProvider>(
