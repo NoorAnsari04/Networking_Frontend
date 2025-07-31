@@ -1,16 +1,23 @@
+import 'package:dio/dio.dart' as dio;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:my_test_app_flavors/core/constants/api_constants.dart';
 import 'package:my_test_app_flavors/modules/auth/services/app_user.dart';
 import 'package:my_test_app_flavors/modules/events/components/event_poster.dart';
 import 'package:my_test_app_flavors/modules/events/screens/ticket_screen.dart';
 import 'package:my_test_app_flavors/modules/events/speakers/services/speaker_provider.dart';
 import 'package:my_test_app_flavors/modules/events/ticket/services/ticket_provider.dart';
 import 'package:provider/provider.dart';
+import '../../../core/constants/dio_client.dart';
+import '../../../core/serviceLocator.dart';
+import '../../../core/services/hive_services.dart';
+import '../../auth/services/auth_provider.dart';
 import '../components/grid_items.dart';
 import '../services/event_model.dart';
 import '../speakers/screens/speakers_screen.dart';
 import '../swipe and connect/screens/swipe_and_connect.dart';
+import '../screens/agenda_screen.dart';
 
 class EventDetailScreen extends StatefulWidget {
   static const id = 'eventDetails';
@@ -28,8 +35,10 @@ class EventDetailScreen extends StatefulWidget {
 }
 
 class _EventDetailScreenState extends State<EventDetailScreen> {
+
   @override
   Widget build(BuildContext context) {
+    HiveService().getUser();
     return Scaffold(
       body: Column(
         children: [
@@ -56,7 +65,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 children: [
                   Text(
                     widget.event.title,
-                    style: TextStyle(fontSize: 28.sp, fontWeight: FontWeight.bold),
+                    style:
+                        TextStyle(fontSize: 28.sp, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 8.h),
                   Text(
@@ -158,7 +168,52 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       height: 142.h,
                       top: 135.h,
                       left: 207.w,
-                      onTap: () {},
+                      onTap: () async {
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (_) =>
+                              const Center(child: CircularProgressIndicator()),
+                        );
+                        try {
+                          final conferenceId = widget.event.eventId;
+                          print(conferenceId);
+                          final url = ApiConstants.baseUrl +
+                              '/api/conference/$conferenceId/agenda';
+                          final token =
+                              await serviceLocator<AuthenticationProvider>()
+                                  .authToken();
+                          final dioInstance = DioClient.getDioInstance();
+                          final response = await dioInstance.get(url,
+                              options: dio.Options(headers: {
+                                "Authorization": "Bearer $token",
+                              }));
+                          Navigator.pop(context);
+                          if (response.statusCode == 200 &&
+                              response.data['success'] == true) {
+                            final String imageUrl =
+                                response.data['data']['agenda']['imgUrl'];
+                            if (context.mounted) {
+                              context.pushNamed(
+                                AgendaScreen.id,
+                                extra: imageUrl,
+                              );
+                            }
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text(response.data['message'] ??
+                                      "Agenda not found.")),
+                            );
+                          }
+                        } catch (e) {
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text("Error loading agenda.")),
+                          );
+                        }
+                      },
                     ),
                     GridItems(
                       title: '',
