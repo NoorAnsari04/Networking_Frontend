@@ -31,7 +31,7 @@ class ProfileNetworking {
   }
 
   Future<String?> refreshToken() async {
-    final refreshToken = await HiveService().getRefreshToken();
+    // final refreshToken = await HiveService().getRefreshToken();
     if (refreshToken == null) {
       print("No refresh token found");
       return null;
@@ -46,7 +46,7 @@ class ProfileNetworking {
     );
     if (response.statusCode == 200 && response.data["success"] == true) {
       final newToken = response.data['token'];
-      await HiveService().saveAccessToken(newToken);
+      // await HiveService().saveAccessToken(newToken);
       return newToken;
     } else {
       print("Failed to refresh token: ${response.data}");
@@ -91,7 +91,7 @@ class ProfileNetworking {
           options: dio.Options(
             headers: {
               "Authorization": "Bearer $token",
-              "Content-Type": "multipart/form-data"
+              // "Content-Type": "multipart/form-data"
             },
           ));
 
@@ -112,11 +112,11 @@ class ProfileNetworking {
         authProvider.updateUser(updatedUser);
         authProvider.updateToken(newToken);
         await HiveService().saveUser(updatedUser);
-        await HiveService().saveAccessToken(newToken);
+        // await HiveService().saveAccessToken(newToken);
 
         print("Token updated: $newToken");
-        final savedToken = await HiveService().getAccessToken();
-        print("Access token from Hive after update: $savedToken");
+        // final savedToken = await HiveService().getAccessToken();
+        // print("Access token from Hive after update: $savedToken");
         //
         // final savedUser = await HiveService().getUser();
         //   print("Saved user from Hive: ${jsonEncode(savedUser?.toJson())}");
