@@ -54,9 +54,10 @@ class BackgroundConnectWidget extends StatelessWidget {
           Container(
             height: 1.sh,
             width: 1.sw,
-            color: color.withOpacity(
-              1.0 - opacity,
-            ),
+            // color: color.withOpacity(
+            //   1.0 - opacity,
+            // ),
+            color: Colors.transparent,
           ),
         ],
       ),
