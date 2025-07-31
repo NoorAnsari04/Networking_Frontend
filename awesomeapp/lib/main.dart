@@ -21,7 +21,6 @@ import 'package:my_test_app_flavors/staging/firebase_options.dart'
     as stg_options;
 import 'package:my_test_app_flavors/production/firebase_options.dart'
     as prod_options;
-
 import 'modules/services/connections_provider.dart';
 
 Future<void> main() async {
@@ -38,47 +37,78 @@ Future<void> main() async {
 
   if (isProduction) {
     firebaseOptions = prod_options.DefaultFirebaseOptions.currentPlatform;
+    print('🚀 Running in **PRODUCTION** mode');
   } else if (isStaging) {
     firebaseOptions = stg_options.DefaultFirebaseOptions.currentPlatform;
+    print('🧪 Running in **STAGING** mode');
   } else {
     firebaseOptions = dev_options.DefaultFirebaseOptions.currentPlatform;
+    print('👨‍💻 Running in **DEVELOPMENT** mode');
   }
 
   await Firebase.initializeApp(
     options: dev_options.DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(const App());
+  final authProvider = AuthenticationProvider();
+  await authProvider.loadUserFromHive();
+
+  runApp(App(authProvider: authProvider));
 }
 
 class App extends StatelessWidget {
-  const App({super.key});
+  final AuthenticationProvider authProvider;
+
+  const App({super.key, required this.authProvider});
+
+  Future<void> _loadUser(BuildContext context) async {
+    final savedUser = await HiveService().getUser();
+    if (savedUser != null) {
+      Provider.of<AuthenticationProvider>(context, listen: false)
+          .updateUser(savedUser);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => AuthenticationProvider()),
-        ChangeNotifierProvider(create: (_) => ConnectionsProvider()),
-        ChangeNotifierProvider(create: (_) => SwipeAndConnectProvider()),
-        ChangeNotifierProvider(create: (_) => EventProvider()),
-        ChangeNotifierProvider(create: (_) => ProfileProvider()),
-        ChangeNotifierProvider(create: (_) => NavigationProvider()),
-        ChangeNotifierProvider(create: (_) => SpeakerProvider()),
-        ChangeNotifierProvider(create: (_) => TicketProvider()),
-      ],
-      child: ScreenUtilInit(
-        designSize: const Size(375, 812),
-        builder: (context, child) {
-          return MaterialApp.router(
-            theme: theme(context),
-            debugShowCheckedModeBanner: false,
-            routeInformationProvider: AppRoutes.router.routeInformationProvider,
-            routeInformationParser: AppRoutes.router.routeInformationParser,
-            routerDelegate: AppRoutes.router.routerDelegate,
+    return FutureBuilder(
+        future: _loadUser(context),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState != ConnectionState.done) {
+            // Can use a splash screen or loader here
+            return const MaterialApp(
+              home: Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              ),
+            );
+          }
+          return MultiProvider(
+            providers: [
+              ChangeNotifierProvider.value(value: authProvider),
+              ChangeNotifierProvider(create: (_) => AuthenticationProvider()),
+              ChangeNotifierProvider(create: (_) => ConnectionsProvider()),
+              ChangeNotifierProvider(create: (_) => SwipeAndConnectProvider()),
+              ChangeNotifierProvider(create: (_) => EventProvider()),
+              ChangeNotifierProvider(create: (_) => ProfileProvider()),
+              ChangeNotifierProvider(create: (_) => NavigationProvider()),
+              ChangeNotifierProvider(create: (_) => SpeakerProvider()),
+              ChangeNotifierProvider(create: (_) => TicketProvider()),
+            ],
+            child: ScreenUtilInit(
+              designSize: const Size(375, 812),
+              builder: (context, child) {
+                return MaterialApp.router(
+                  theme: theme(context),
+                  debugShowCheckedModeBanner: false,
+                  routeInformationProvider:
+                      AppRoutes.router.routeInformationProvider,
+                  routeInformationParser:
+                      AppRoutes.router.routeInformationParser,
+                  routerDelegate: AppRoutes.router.routerDelegate,
+                );
+              },
+            ),
           );
-        },
-      ),
-    );
+        });
   }
 }
