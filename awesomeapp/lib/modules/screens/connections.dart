@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../core/constants/font_constants.dart';
 import '../components/connection_tile.dart';
 import '../services/connections_provider.dart';
+import '../../core/shared/custum_appbar.dart';
 
 class ConnectionsScreen extends StatelessWidget {
   static const id = 'connections';
@@ -26,12 +27,13 @@ class _ConnectionsScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
+        centerTitle: true,
         title: Padding(
           padding: const EdgeInsets.all(15.0),
           child: Text(
             'Connections',
             style: bodyMediumTextStyle.copyWith(
-              fontSize: 20,
+              fontSize: 22,
             ),
           ),
         ),
