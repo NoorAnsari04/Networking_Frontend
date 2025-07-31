@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:my_test_app_flavors/core/constants/color_constants.dart';
 import 'package:my_test_app_flavors/core/extensions/extension.dart';
@@ -161,8 +162,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           yearsOfExperience: _isStudent ? null : _experienceController.text,
           sessionsDeliver:_authProvider.appUser!.sessionsDeliver,
           accessToken: _authProvider.appUser!.accessToken,
+          conferenceId: _authProvider.appUser!.conferenceId,
         );
-
+        print(updatedUser);
         _authProvider.updateUser(updatedUser);
         context.showSnackBar('Profile updated Successfully');
         // _authProvider.updateUser(userData as AppUser);
@@ -182,16 +184,90 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
+  // @override
+  // Widget build(BuildContext context) {
+  //   return Scaffold(
+  //     body: SingleChildScrollView(
+  //       child: Stack(
+  //         children: [
+  //           Container(
+  //             height: MediaQuery.of(context).size.height / 4,
+  //             color: ColorConstants.primaryColor,
+  //           ),
+  //           Column(
+  //             children: [
+  //               SizedBox(height: MediaQuery.of(context).size.height / 4 - 80.h),
+  //               UserProfileAvatar(
+  //                 imageUrl: _imageUrl,
+  //                 name: _authProvider.appUser!.name,
+  //                 lastName: _authProvider.appUser!.lastName,
+  //                 isEditable: true,
+  //                 onEditTap: _pickImage,
+  //                 newImage: _image,
+  //                 outerRadius: 75.w,
+  //                 innerRadius: 67.w,
+  //               ),
+  //               20.height,
+  //               Padding(
+  //                 padding: EdgeInsets.symmetric(horizontal: 30.0),
+  //                 child: EditProfileForm(
+  //                   formKey: _formKey,
+  //                   nameController: _nameController,
+  //                   emailController: _emailController,
+  //                   linkedinController: _linkedinController,
+  //                   descriptionController: _descriptionController,
+  //                   isStudent: _isStudent,
+  //                   companyController: _isStudent ? null : _companyController,
+  //                   positionController: _isStudent ? null : _positionController,
+  //                   experienceController:
+  //                       _isStudent ? null : _experienceController,
+  //                   degreeProgramController:
+  //                       _isStudent ? _degreeProgramController : null,
+  //                   yearOfGraduationController:
+  //                       _isStudent ? _yearOfGraduationController : null,
+  //                   instituteNameController:
+  //                       _isStudent ? _instituteNameController : null,
+  //                   onUpdateProfile: _updateProfile,
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
         child: Stack(
           children: [
+            // Purple background
             Container(
               height: MediaQuery.of(context).size.height / 4,
               color: ColorConstants.primaryColor,
             ),
+
+            SafeArea(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: SvgPicture.asset(
+                      'assets/arrow_icon.svg',
+                      height: 30.h,
+                      width: 25.w,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            // Content below banner (no change to layout)
             Column(
               children: [
                 SizedBox(height: MediaQuery.of(context).size.height / 4 - 80.h),
@@ -217,17 +293,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     isStudent: _isStudent,
                     companyController: _isStudent ? null : _companyController,
                     positionController: _isStudent ? null : _positionController,
-                    experienceController:
-                        _isStudent ? null : _experienceController,
-                    degreeProgramController:
-                        _isStudent ? _degreeProgramController : null,
-                    yearOfGraduationController:
-                        _isStudent ? _yearOfGraduationController : null,
-                    instituteNameController:
-                        _isStudent ? _instituteNameController : null,
+                    experienceController: _isStudent ? null : _experienceController,
+                    degreeProgramController: _isStudent ? _degreeProgramController : null,
+                    yearOfGraduationController: _isStudent ? _yearOfGraduationController : null,
+                    instituteNameController: _isStudent ? _instituteNameController : null,
                     onUpdateProfile: _updateProfile,
                   ),
                 ),
+                30.height,
               ],
             ),
           ],
@@ -235,4 +308,5 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       ),
     );
   }
+
 }
