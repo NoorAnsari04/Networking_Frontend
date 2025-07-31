@@ -11,12 +11,12 @@ class Refreshtokeninterceptor extends Interceptor {
   @override
   Future<void> onRequest(
       RequestOptions options, RequestInterceptorHandler handler) async {
-    final user = hiveService.getUser();
-    final accessToken = hiveService.getAccessToken();
+    final user = await hiveService.getUser();
+    // final accessToken = await hiveService.getAccessToken();
 
-    if (accessToken != null) {
-      options.headers['Authorization'] = 'Bearer $accessToken';
-    }
+    // if (accessToken != null && accessToken.isNotEmpty) {
+    //   options.headers['Authorization'] = 'Bearer $accessToken';
+    // }
 
     return super.onRequest(options, handler);
   }
@@ -26,7 +26,7 @@ class Refreshtokeninterceptor extends Interceptor {
       Response response, ResponseInterceptorHandler handler) async {
     if (response.statusCode == 401) {
       print('Access token expired. Attempting to refresh....');
-      final user = hiveService.getUser();
+      final user = await hiveService.getUser();
       final refreshToken = user?.refreshToken;
 
       if (refreshToken != null) {
@@ -41,9 +41,9 @@ class Refreshtokeninterceptor extends Interceptor {
             final newRefreshToken = refreshResponse.data['refresh_token'];
             final updatedUser = user?.copyWith(accessToken: newAccessToken);
             hiveService.saveUser(updatedUser!);
-            if (newRefreshToken != null) {
-              await hiveService.saveRefreshToken(newRefreshToken);
-            }
+            // if (newRefreshToken != null) {
+            //   await hiveService.saveRefreshToken(newRefreshToken);
+            // }
             // final retryOptions = response.requestOptions.copyWith(
             //   headers: {'Auhorization': 'Bearer $newAccessToken'},
             // );
@@ -76,7 +76,7 @@ class Refreshtokeninterceptor extends Interceptor {
             //   queryParameters: response.requestOptions.queryParameters
             // );
           } else {
-            print("Failed to refresh roken");
+            print("Failed to refresh token");
           }
         } catch (e) {
           return handler.reject(DioException(
