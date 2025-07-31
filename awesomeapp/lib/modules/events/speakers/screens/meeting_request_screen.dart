@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:my_test_app_flavors/core/constants/color_constants.dart';
 import 'package:my_test_app_flavors/core/extensions/scaffold_message.dart';
 import 'package:my_test_app_flavors/modules/events/speakers/services/speaker_provider.dart';
@@ -23,7 +25,7 @@ class MeetingRequestScreen extends StatefulWidget {
   _MeetingRequestScreenState createState() => _MeetingRequestScreenState();
 }
 
-class _MeetingRequestScreenState extends State<MeetingRequestScreen> {
+class _MeetingRequestScreenState extends State<MeetingRequestScreen>  {
   late final AuthenticationProvider _authProvider;
   late final SpeakerProvider _speakerProvider;
 
@@ -137,6 +139,19 @@ class _MeetingRequestScreenState extends State<MeetingRequestScreen> {
                 ),
               ),
             ),
+            Positioned(
+              top: 50.h, // adjust if needed based on your status bar height
+              left: 16.w,
+              child: GestureDetector(
+                onTap: () => Navigator.of(context).pop(),
+                child: SvgPicture.asset(
+                  'assets/arrow_icon.svg',
+                  height: 30.h,
+                  width: 15.w,
+                ),
+              ),
+            ),
+
             MeetingRequestForm(
               speaker: widget.speaker,
               isViewOnly: widget.isViewOnly,
