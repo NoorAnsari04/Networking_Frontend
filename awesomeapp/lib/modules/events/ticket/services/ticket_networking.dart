@@ -14,7 +14,7 @@ class TicketNetworking {
       final dioInstance = DioClient.getDioInstance();
 
       final response = await dioInstance.post(url,
-          options: dio.Options(headers: {"Authorization": "Bearer: $token"}));
+          options: dio.Options(headers: {"Authorization": "Bearer $token"}));
       print(response.data);
 
       if (response.statusCode == 200) {
