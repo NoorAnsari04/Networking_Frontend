@@ -72,7 +72,7 @@ class _SwipeAndConnectScreenState extends State<SwipeAndConnectScreen> {
       try {
         await provider.loadInterests();
         await provider.loadUsers(widget.event.eventId,
-            profession: 'profession', industry: 'industry');
+            profession: 'designation', industry: 'interests');
         print("Finished loading interests and users");
       } catch (e) {
         print("Error in initialization: $e");
@@ -141,19 +141,23 @@ class _SwipeAndConnectScreenState extends State<SwipeAndConnectScreen> {
                             child: SvgPicture.asset(
                               'assets/backward_arrow_head.svg',
                               height: 25.h,
-                              width: 15.w,
+                              width: 20.w,
                             ),
                           ),
                         ),
                         SizedBox(width: 250.w),
                         GestureDetector(
                           onTap: () async {
-                            final result = await context.pushNamed(PreferencesScreen.id);
-                            if(result != null && result is Map){
-                              final profession = result['profession'];
-                              final industry = result['industry'];
-                              final provider = Provider.of<SwipeAndConnectProvider>(context, listen: false);
-                              provider.loadUsers(widget.event.eventId, profession: profession, industry: industry);
+                            final result =
+                                await context.pushNamed(PreferencesScreen.id);
+                            if (result != null && result is Map) {
+                              final designation = result['designation'];
+                              final interests = result['interests'];
+                              final provider =
+                                  Provider.of<SwipeAndConnectProvider>(context,
+                                      listen: false);
+                              provider.loadUsers(widget.event.eventId,
+                                  profession: designation, industry: interests);
                             }
                           },
                           child: Padding(
@@ -218,8 +222,7 @@ class _SwipeAndConnectScreenState extends State<SwipeAndConnectScreen> {
                                               action: false,
                                               conferenceId:
                                                   widget.event.eventId);
-                                          context
-                                              .showSnackBar('User skipped');
+                                          context.showSnackBar('User skipped');
                                         }
                                         showSecondCard.value = true;
                                       },
@@ -267,8 +270,8 @@ class _SwipeAndConnectScreenState extends State<SwipeAndConnectScreen> {
                                                   action: false,
                                                   conferenceId:
                                                       widget.event.eventId);
-                                              context.showSnackBar(
-                                                  'User Skipped');
+                                              context
+                                                  .showSnackBar('User Skipped');
                                             },
                                             onConnect: () {
                                               provider.swipeAndConnectAction(
