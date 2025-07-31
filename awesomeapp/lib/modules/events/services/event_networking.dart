@@ -12,8 +12,8 @@ class EventNetworking {
     print('Requesting events from: $url');
 
     try {
-      // final token = await serviceLocator<AuthenticationProvider>().authToken();
-      final token = await HiveService().getAccessToken();
+      final token = await serviceLocator<AuthenticationProvider>().authToken();
+      // final token = await HiveService().getAccessToken();
       print("Access Token from hive: $token");
       final dioInstance = DioClient.getDioInstance();
       final response = await dioInstance.get(url,
