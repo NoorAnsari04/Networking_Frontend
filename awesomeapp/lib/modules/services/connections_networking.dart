@@ -107,13 +107,15 @@ class ConnectionsNetworking {
       final appUser = HiveService().getUser();
       final currentUserId = appUser?.id ?? '';
       print("currentUserId: $currentUserId");
+      final token = await serviceLocator<AuthenticationProvider>().authToken();
+
 
       // Make the API call
       final response = await dioInstance.get(
         url,
         options: Options(headers: {
           "Authorization":
-              "Bearer ${serviceLocator<AuthenticationProvider>().authToken()}",
+              "Bearer $token",
         }),
       );
       print("API response: ${response.data}");
@@ -121,7 +123,6 @@ class ConnectionsNetworking {
       if (response.statusCode != 200) {
         throw Exception("Failed to load connections: ${response.statusCode}");
       }
-
       // Parse the response data
       final Map<String, dynamic> responseData = response.data;
 
@@ -147,35 +148,44 @@ class ConnectionsNetworking {
       // Loop through each connection
       for (var connection in connections) {
         if (connection is Map<String, dynamic>) {
-          final Map<String, dynamic> senderDetails = connection['sender'] as Map<String, dynamic>;
-          final String senderId = senderDetails['_id'] as String;
-          final String receiverId = connection['receiver'] as String;
-
-          print("DEBUG: Connection - senderId: $senderId, receiverId: $receiverId");
-          print("DEBUG: Comparing with currentUserId: $currentUserId");
+          final Map<String, dynamic> senderDetails =
+              connection['sender'] as Map<String, dynamic>;
+          final Map<String, dynamic> receiverDetails = connection['receiver'];
+          final String senderId = senderDetails['_id'] ?? '';
+          final String receiverId = receiverDetails['_id'] ?? '';
+          // print(
+          //     "DEBUG: Connection - senderId: $senderId, receiverId: $receiverId");
+          // print("DEBUG: Comparing with currentUserId: $currentUserId");
 
           if (senderId == currentUserId) {
             // Current user is the sender, add receiver
-            print("DEBUG: Current user is the sender, fetching receiver details");
-            Map<String, dynamic>? receiverDoc = await AuthNetworking().getUserDocument(receiverId);
-            if(receiverDoc != null){
-              AppUser receiverUser = AppUser.fromJson(receiverDoc);
-              receiverUser.id = receiverId;
-              connectionsList.add(receiverUser);
-              print("DEBUG: Added receiver to connections list");
-            } else {
-              print("DEBUG: Receiver document is null for ID: $receiverId");
-            }
+            // print(
+            //     "DEBUG: Current user is the sender, fetching receiver details");
+            // Map<String, dynamic>? receiverDoc =
+            //     await AuthNetworking().getUserDocument(receiverId);
+            AppUser receiverUser = AppUser.fromJson(receiverDetails);
+            receiverUser.id = receiverId;
+            connectionsList.add(receiverUser);
+            // if (receiverDoc != null) {
+            //   AppUser receiverUser = AppUser.fromJson(receiverDoc);
+            //   receiverUser.id = receiverId;
+            //   connectionsList.add(receiverUser);
+            //   print("DEBUG: Added receiver to connections list");
+            // } else {
+            //   print("DEBUG: Receiver document is null for ID: $receiverId");
+            // }
           } else if (receiverId == currentUserId) {
             // Current user is the receiver, add sender
-            print("DEBUG: Current user is the receiver, adding sender");
+            // print("DEBUG: Current user is the receiver, adding sender");
             AppUser senderUser = AppUser.fromJson(senderDetails);
             senderUser.id = senderId;
             connectionsList.add(senderUser);
-            print("DEBUG: Added sender to connections list");
-          } else {
-            print("DEBUG: Current user ($currentUserId) is neither sender ($senderId) nor receiver ($receiverId)");
+            // print("DEBUG: Added sender to connections list");
           }
+            // else {
+          //   print(
+          //       "DEBUG: Current user ($currentUserId) is neither sender ($senderId) nor receiver ($receiverId)");
+          // }
         }
       }
 
