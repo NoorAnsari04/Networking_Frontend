@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:my_test_app_flavors/modules/screens/contact_us.dart';
+import 'package:my_test_app_flavors/modules/screens/terms_and_conditions.dart';
 
 import '../screens/edit_profile_screen.dart';
 
@@ -36,7 +37,7 @@ class ProfileActionCard extends StatelessWidget {
             leading: Icon(Icons.description),
             title: Text('Terms & Conditions'),
             trailing: Icon(Icons.arrow_forward_ios),
-            onTap: () {},
+            onTap: () => context.pushNamed<bool>(TermsAndConditions.id),
           ),
           Divider(),
           ListTile(
