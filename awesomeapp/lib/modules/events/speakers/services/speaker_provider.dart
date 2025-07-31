@@ -77,8 +77,8 @@ class SpeakerProvider with ChangeNotifier {
   }
 
   Future<String> getRequestStatus(String receiverId) async {
-    var res = await _speakerNetworking.getRequestStatus(receiverId);
-    return res;
+    final result = await _speakerNetworking.getRequestStatus(receiverId);
+    return result;
   }
 
   // Future<void> acceptMeetingRequest(String requestId, String senderId) async {
