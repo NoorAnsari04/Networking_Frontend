@@ -6,6 +6,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:my_test_app_flavors/core/constants/color_constants.dart';
+import 'package:my_test_app_flavors/core/services/hive_services.dart';
 import 'package:my_test_app_flavors/modules/events/screens/event_detail_screen.dart';
 import 'package:my_test_app_flavors/modules/events/services/event_provider.dart';
 import 'package:provider/provider.dart';
