@@ -49,12 +49,9 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _handleLogin() async {
     if (_formKey.currentState!.validate()) {
       final authProc =
-          Provider.of<AuthenticationProvider>(context, listen: false);
+      Provider.of<AuthenticationProvider>(context, listen: false);
       final success = await authProc.login(
-        context,
-        _emailController.text,
-        _passwordController.text
-      );
+          context, _emailController.text, _passwordController.text);
 
       if (!mounted) return;
 
@@ -78,39 +75,106 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  // Future<void> _handleGoogleSignIn() async {
+  //   final authProc =
+  //   Provider.of<AuthenticationProvider>(context, listen: false);
+  //   final success = await authProc.googleSignIn(context);
+  //   if (!mounted) return;
+  //
+  //   if (success != null && success['firebaseUSer'] != null) {
+  //     final isNewUser = success['isNewUser'] == true;
+  //     if (isNewUser) {
+  //       final user = FirebaseAuth.instance.currentUser;
+  //       final signupData = {
+  //         'email': user?.email,
+  //         'name': user?.displayName,
+  //         'imageUrl': user?.photoURL
+  //       };
+  //       context.goNamed(UserDetailsScreen.id,
+  //           extra: {'signupData': signupData, 'isGoogleSignIn': true},
+  //       );
+  //     } else {
+  //       context.goNamed(HomeScreen.id);
+  //     }
+  //     // Get the current user
+  //     // final user = FirebaseAuth.instance.currentUser;
+  //     // if (user != null) {
+  //     //   // Check if the user document already exists
+  //     //   final documentExists = await authProc.isUserDocumentExist();
+  //     //
+  //     //   if (documentExists) {
+  //     //     // If the document exists, go directly to the HomeScreen
+  //     //     context.goNamed(HomeScreen.id);
+  //     //   } else {
+  //     //     // If the document doesn't exist, prepare signupData and go to UserDetailsScreen
+  //     //     final signupData = {
+  //     //       'email': user.email,
+  //     //       'name': user.displayName,
+  //     //       // Add any other data you want to pre-fill
+  //     //     };
+  //     //
+  //     //     context.goNamed(UserDetailsScreen.id,
+  //     //         extra: {'signupData': signupData, 'isGoogleSignIn': true});
+  //     //   }
+  //     // }
+  //
+  //     // if (user != null) {
+  //     //   context.goNamed(HomeScreen.id);
+  //     // }
+  //   } else {
+  //     context.showSnackBar('Google Login Failed');
+  //   }
+  // }
   Future<void> _handleGoogleSignIn() async {
     final authProc =
-        Provider.of<AuthenticationProvider>(context, listen: false);
-    final success = await authProc.googleSignIn();
+    Provider.of<AuthenticationProvider>(context, listen: false);
+    final success = await authProc.googleSignIn(context);
     if (!mounted) return;
 
-    if (success) {
-      // Get the current user
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        // Check if the user document already exists
-        final documentExists = await authProc.isUserDocumentExist();
-
-        if (documentExists) {
-          // If the document exists, go directly to the HomeScreen
-          context.goNamed(HomeScreen.id);
-        } else {
-          // If the document doesn't exist, prepare signupData and go to UserDetailsScreen
-          final signupData = {
-            'email': user.email,
-            'name': user.displayName,
-            // Add any other data you want to pre-fill
-          };
-
-          context.goNamed(UserDetailsScreen.id,
-              extra: {'signupData': signupData, 'isGoogleSignIn': true});
-        }
+    if (success != null && success['firebaseUser'] != null) {
+      final isNewUser = success['isNewUser'] == true;
+      if (isNewUser) {
+        final user = FirebaseAuth.instance.currentUser;
+        final signupData = {
+          'email': user?.email,
+          'name': user?.displayName,
+          'imageUrl': user?.photoURL
+        };
+        context.goNamed(UserDetailsScreen.id, extra:
+        {'signupData': signupData, 'isGoogleSignIn': true},
+        );
+      } else {
+        context.goNamed(HomeScreen.id);
       }
+      // final user = FirebaseAuth.instance.currentUser;
+      // if (user != null) {
+      //   final idToken = await user. getIdToken();
+      //   print("IdToken: $idToken");
+      //   // Check if the user document already exists
+      //   final documentExists = await authProc.isUserDocumentExist();
+      //
+      //   if (documentExists) {
+      //     // If the document exists, go directly to the HomeScreen
+      //     context.goNamed(HomeScreen.id);
+      //   } else {
+      //     // If the document doesn't exist, prepare signupData and go to UserDetailsScreen
+      //     final signupData = {
+      //       'email': user.email,
+      //       'name': user.displayName,
+      //       'imageUrl': user.photoURL,
+      //     };
+      //
+      //     context.goNamed(UserDetailsScreen.id,
+      //         extra: {'signupData': signupData, 'isGoogleSignIn': true});
+      //   }
+      // }
+      // if (user != null) {
+      //   context.goNamed(HomeScreen.id);
+      // }
     } else {
       context.showSnackBar('Google Login Failed');
     }
-  }
-
+  }x
   void _handleAppleSignIn() {
     // Handle Apple sign-in
   }
@@ -124,7 +188,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isLoading = Provider.of<AuthenticationProvider>(context).isLoading;
+    final isLoading = Provider
+        .of<AuthenticationProvider>(context)
+        .isLoading;
 
     return Scaffold(
       body: Stack(
@@ -176,8 +242,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               text: 'Sign Up',
                               style: bodysmallTextStyle,
                               recognizer: TapGestureRecognizer()
-                                ..onTap =
-                                    () => context.pushNamed(SignupScreen.id),
+                                ..onTap = () {
+                                  print('Tapped Sign Up');
+                                  context.pushNamed(SignupScreen.id);
+                                },
                             ),
                           ],
                         ),
