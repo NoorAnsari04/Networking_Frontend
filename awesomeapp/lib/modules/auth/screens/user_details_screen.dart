@@ -34,25 +34,45 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
   final formData = FormData();
 
   @override
+  // Widget build(BuildContext context) {
+  //   return Scaffold(
+  //     body: Column(
+  //       children: [
+  //         _buildHeader(context),
+  //         Expanded(
+  //           child: Padding(
+  //             padding: const EdgeInsets.all(16.0),
+  //             child: Form(
+  //               key: _formKey,
+  //               child: _buildFormContent(),
+  //             ),
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: [
-          _buildHeader(context),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Form(
-                key: _formKey,
-                child: _buildFormContent(),
+    return WillPopScope(
+      onWillPop: () async => false, // disable Android back button
+      child: Scaffold(
+        body: Column(
+          children: [
+            _buildHeader(context),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Form(
+                  key: _formKey,
+                  child: _buildFormContent(),
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
-
   Widget _buildHeader(BuildContext context) {
     return Container(
       height: MediaQuery.of(context).size.height / 6,
@@ -64,6 +84,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
         title: 'User Details',
         iconPath: IconConstants.backward_arrow,
         titleColor: Colors.white,
+        showBackButton: false,
       ),
     );
   }
