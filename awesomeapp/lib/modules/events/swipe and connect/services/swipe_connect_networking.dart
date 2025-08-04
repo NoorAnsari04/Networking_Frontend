@@ -9,6 +9,8 @@ import 'package:my_test_app_flavors/modules/auth/services/auth_provider.dart';
 import '../../../../core/constants/dio_client.dart';
 import 'package:dio/dio.dart';
 
+import '../components/dropdown.dart';
+
 class SwipeAndConnectNetworking {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -16,10 +18,41 @@ class SwipeAndConnectNetworking {
 
   Future<Map<String, String>> loadInterests() async {
     final url = ApiConstants.baseUrl + ApiConstants.loadInterests;
+
     try {
-      final response = await dioInstance.get(url);
+      final token = await serviceLocator<AuthenticationProvider>().authToken();
+      final response = await dioInstance.get(url,
+          options: Options(headers: {'Authorization': 'Bearer $token'}));
       if (response.statusCode == 200) {
-        return Map<String, String>.from(response.data);
+        // return Map<String, String>.from(response.data);
+        final List interests = response.data['data']['allInterests'];
+        final Map<String, String> interestMap = {
+          for (var item in interests)
+            item['name'] as String: item['_id'] as String,
+        };
+        return interestMap;
+      }
+      throw Exception("Failed to load interests");
+    } catch (error) {
+      print("Error loading interests: $error");
+      throw error;
+    }
+  }
+
+  Future<List<DropdownOptions>> loadDropdownInterests() async {
+    final url = ApiConstants.baseUrl + ApiConstants.loadInterests;
+
+    try {
+      final token = await serviceLocator<AuthenticationProvider>().authToken();
+      final response = await dioInstance.get(url,
+          options: Options(headers: {'Authorization': 'Bearer $token'}));
+      if (response.statusCode == 200) {
+        // return Map<String, String>.from(response.data);
+
+        var interests=(response.data['data']['allInterests'] as List).map((e)=>DropdownOptions.fromJson(e)).toList();
+        print("Loaded ${interests.length} industries.");
+        // notifyListeners();
+        return interests;
       }
       throw Exception("Failed to load interests");
     } catch (error) {
@@ -35,14 +68,14 @@ class SwipeAndConnectNetworking {
     }
     final url = ApiConstants.baseUrl + ApiConstants.fetchInterestName;
     try {
-      print("Fetching interest names for ${interestIds.length} IDs: $interestIds");
+      print(
+          "Fetching interest names for ${interestIds.length} IDs: $interestIds");
+      final token = await serviceLocator<AuthenticationProvider>().authToken();
 
-      final response = await dioInstance.get(
-        url,
-        data: {
-          'interestIds': interestIds
-        }
-      );
+      final response = await dioInstance.get(url,
+          data: {'interestIds': interestIds},
+          options: Options(headers: {'Authorization': 'Bearer $token'}));
+      print('API Raw Response: ${response.data}');
 
       if (response.statusCode == 200) {
         print("Successfully fetched interest names: ${response.data}");
@@ -58,8 +91,7 @@ class SwipeAndConnectNetworking {
     }
   }
 
-  Future<List<AppUser>> loadUsers(String conferenceId,
-      {String? profession, String? industry}) async {
+  Future<List<AppUser>> loadUsers(String conferenceId, {String? userType,String? profession, String? industry}) async {
     final url = ApiConstants.baseUrl + '/api/snc/conference/$conferenceId';
     try {
       if (conferenceId.isEmpty || !isValidConferenceId(conferenceId)) {
@@ -68,11 +100,36 @@ class SwipeAndConnectNetworking {
       }
       String currentUserId = _auth.currentUser?.uid ?? '';
       print("Loading users for current user ID: $currentUserId");
+      final token = await serviceLocator<AuthenticationProvider>().authToken();
 
-      final response = await dioInstance.get(url, queryParameters: {
-        'profession': profession,
-        'industry': industry,
-      });
+      // final response = await dioInstance.get(
+      //   url,
+      //   // queryParameters: {
+      //   //   'userType': profession != null ? 'Industry Person' : 'Student',
+      //   //   if (profession != null) 'designation': profession,
+      //   //   if (industry != null && industry.isNotEmpty) 'interests': industry,
+      //   // },
+      //   queryParameters: {
+      //     if (userType != null) 'userType': userType,
+      //     if (profession != null) 'designation': profession,
+      //     if (industry != null && industry.isNotEmpty) 'interests': industry,
+      //   },
+      //   options: Options(headers: {'Authorization': 'Bearer $token'}),
+      // );
+      final queryParams = {
+        if (userType != null) 'userType': userType,
+        if (profession != null) 'designation': profession,
+        if (industry != null && industry.isNotEmpty) 'interests': industry,
+      };
+
+      print('➡️ URL: $url');
+      print('➡️ Query Params: $queryParams');
+
+      final response = await dioInstance.get(
+        url,
+        queryParameters: queryParams,
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
 
       if (response.statusCode == 200) {
         final data = response.data;
@@ -95,7 +152,8 @@ class SwipeAndConnectNetworking {
             if (allInterestIds.isNotEmpty) {
               try {
                 // Fetch all interest names in one call
-                Map<String, String> interestMap = await fetchInterestNames(allInterestIds.toList());
+                Map<String, String> interestMap =
+                    await fetchInterestNames(allInterestIds.toList());
 
                 // Assign interest names to each user
                 for (var user in attendees) {
@@ -112,7 +170,8 @@ class SwipeAndConnectNetworking {
                 // Set default interest names if mapping fails
                 for (var user in attendees) {
                   if (user.interests != null) {
-                    user.interestNames = user.interests!.map((id) => 'Interest: $id').toList();
+                    user.interestNames =
+                        user.interests!.map((id) => 'Interest: $id').toList();
                   } else {
                     user.interestNames = [];
                   }
@@ -293,11 +352,7 @@ class SwipeAndConnectNetworking {
 //     }
 //     return null;
 //   }
-  Future<void> swipeAndConnectAction({
-    required String receiverId,
-    required bool action,
-    required String conferenceId,
-  }) async {
+  Future<void> swipeAndConnectAction({required String receiverId, required bool action, required String conferenceId,}) async {
     try {
       final url =
           ApiConstants.baseUrl + '/api/snc//conference/$conferenceId/swipe';

@@ -11,6 +11,7 @@ class TicketNetworking {
     final url = ApiConstants.baseUrl + '/api/ticket/$eventId';
     try {
       final token = await serviceLocator<AuthenticationProvider>().authToken();
+      print(token);
       final dioInstance = DioClient.getDioInstance();
 
       final response = await dioInstance.post(url,

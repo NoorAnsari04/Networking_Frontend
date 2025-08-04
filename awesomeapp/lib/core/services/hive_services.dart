@@ -44,12 +44,12 @@ class HiveService {
   //   _userBox.delete(userKey);
   // }
   Future<void> deleteUser() async {
-    final userBox = await Hive.openBox<AppUser>(HiveService.userBoxName);
-    await userBox.delete(HiveService.userKey);
+    // final userBox = await Hive.openBox<AppUser>(HiveService.userBoxName);
+    await _userBox.delete(HiveService.userKey);
 
-    final tokenBox = await Hive.openBox(HiveService.tokenBoxName);
-    await tokenBox.delete(HiveService.accessTokenKey);
-    await tokenBox.delete(HiveService.refreshTokenKey);
+    // final tokenBox = await Hive.openBox(HiveService.tokenBoxName);
+    await _tokenBox.delete(HiveService.accessTokenKey);
+    await _tokenBox.delete(HiveService.refreshTokenKey);
   }
 
   // Future<void> saveAccessToken(String token) async {

@@ -11,13 +11,13 @@ class Validator {
   }
 
   static String? validatePassword(String? password) {
-    RegExp regex = RegExp(r'^(?=.*\d)(?=.*[A-Z])(?=.*\W).{8}$');
+    RegExp regex = RegExp(r'^(?=.*\d)(?=.*[A-Z])(?=.*\W).{8,}$');
     if (password == null || password.isEmpty) {
       return 'Password can\'t be empty';
     }
     //TODO change this length to 8 again
     
-    if (password.length < 1) {
+    if (password.length < 8) {
       return !regex.hasMatch(password)
           ? "Password must be 8 bit long having a special character and an uppercase character also an integer"
           : null;

@@ -174,7 +174,7 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       context.showSnackBar('Google Login Failed');
     }
-  }x
+  }
   void _handleAppleSignIn() {
     // Handle Apple sign-in
   }

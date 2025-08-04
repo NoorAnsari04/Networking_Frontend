@@ -71,8 +71,9 @@ class _SwipeAndConnectScreenState extends State<SwipeAndConnectScreen> {
       setState(() => _isLoadingInterests = true);
       try {
         await provider.loadInterests();
-        await provider.loadUsers(widget.event.eventId,
-            profession: 'designation', industry: 'interests');
+        // await provider.loadUsers(widget.event.eventId,
+        //     profession: 'designation', industry: 'interests');
+        // provider.loadUsers(widget.event.eventId);
         print("Finished loading interests and users");
       } catch (e) {
         print("Error in initialization: $e");
@@ -111,207 +112,377 @@ class _SwipeAndConnectScreenState extends State<SwipeAndConnectScreen> {
     return ['General'];
   }
 
+  // @override
+  // Widget build(BuildContext context) {
+  //   return Stack(
+  //     children: [
+  //       Scaffold(
+  //         body: Consumer<SwipeAndConnectProvider>(
+  //           builder: (context, provider, _) {
+  //             if (provider.isLoading || _isLoadingInterests) {
+  //               return Center(
+  //                 child: CircularProgressIndicator(),
+  //               );
+  //             } else if (provider.attendees.isEmpty) {
+  //               return const Center(
+  //                 child: Text('No more users available'),
+  //               );
+  //             } else {
+  //               return Column(
+  //                 children: [
+  //                   50.height,
+  //                   Row(
+  //                     children: [
+  //                       GestureDetector(
+  //                         onTap: () {
+  //                           Navigator.pop(context);
+  //                         },
+  //                         child: Padding(
+  //                           padding: EdgeInsets.all(20.0.w),
+  //                           child: SvgPicture.asset(
+  //                             'assets/backward_arrow_head.svg',
+  //                             height: 25.h,
+  //                             width: 20.w,
+  //                           ),
+  //                         ),
+  //                       ),
+  //                       SizedBox(width: 250.w),
+  //                       GestureDetector(
+  //                         onTap: () async {
+  //                           final result =
+  //                               await context.pushNamed(PreferencesScreen.id);
+  //                           if (result != null && result is Map) {
+  //                             final userType = result['userType'];
+  //                             final designation = result['profession'];
+  //                             final interests = result['industry'];
+  //                             print('🌀 Returned from PreferencesScreen:');
+  //                             print('➡️ userType: $userType');
+  //                             print('➡️ designation (profession): $designation');
+  //                             print('➡️ interests (industry): $interests');
+  //
+  //                             final provider =
+  //                                 Provider.of<SwipeAndConnectProvider>(context,
+  //                                     listen: false);
+  //                             provider.loadUsers(widget.event.eventId,userType:userType,
+  //                                 profession: designation, industry: interests);
+  //                           }
+  //                         },
+  //                         child: Padding(
+  //                           padding: EdgeInsets.all(10.w),
+  //                           child: SvgPicture.asset(
+  //                             IconConstants.filterIcon,
+  //                             height: 30.h,
+  //                             width: 20.w,
+  //                           ),
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                   Expanded(
+  //                     child: Padding(
+  //                       padding: const EdgeInsets.all(24),
+  //                       child: PageView.builder(
+  //                         scrollDirection: Axis.horizontal,
+  //                         physics: NeverScrollableScrollPhysics(),
+  //                         onPageChanged: (index) {},
+  //                         allowImplicitScrolling: false,
+  //                         itemCount: provider.attendees.length,
+  //                         controller: _pageController,
+  //                         itemBuilder: (context, index) {
+  //                           final user = provider.attendees[index];
+  //                           final interestNames = getInterestNames(user);
+  //                           return ValueListenableBuilder<double>(
+  //                             valueListenable: offsetXNotifier,
+  //                             builder: (context, offsetX, child) {
+  //                               return Stack(
+  //                                 children: [
+  //                                   if ((index + 1) < provider.attendees.length)
+  //                                     BackgroundConnectWidget(
+  //                                       connect: provider.attendees[index + 1],
+  //                                       opacity: offsetX.clamp(0.0, 1.0),
+  //                                       color: _color.value,
+  //                                       showSecondCard: showSecondCard.value,
+  //                                       conferenceId: widget.event.eventId,
+  //                                     ),
+  //                                   SwipeWidget(
+  //                                     onChange: onDxChange,
+  //                                     onActionPerformed: (vl) {
+  //                                       if (vl > 200) {
+  //                                         provider.swipeAndConnectAction(
+  //                                             receiverId:
+  //                                                 provider.attendees[index].id,
+  //                                             action: true,
+  //                                             conferenceId:
+  //                                                 widget.event.eventId);
+  //                                         if (provider.attendees[index]
+  //                                             .isReceivedRequest) {
+  //                                           HelperFunction.showToast(
+  //                                               'You both are connected now');
+  //                                         } else {
+  //                                           context
+  //                                               .showSnackBar('Request sent');
+  //                                         }
+  //                                       } else if (vl < -200) {
+  //                                         provider.swipeAndConnectAction(
+  //                                             receiverId:
+  //                                                 provider.attendees[index].id,
+  //                                             action: false,
+  //                                             conferenceId:
+  //                                                 widget.event.eventId);
+  //                                         context.showSnackBar('User skipped');
+  //                                       }
+  //                                       showSecondCard.value = true;
+  //                                     },
+  //                                     child: ValueListenableBuilder<bool>(
+  //                                       valueListenable: showSecondCard,
+  //                                       builder: (context, showSecond, _) {
+  //                                         return AttendeeCard(
+  //                                           imageUrl: provider
+  //                                               .attendees[index].imageUrl,
+  //                                           name:
+  //                                               provider.attendees[index].name,
+  //                                           lastName: provider
+  //                                               .attendees[index].lastName,
+  //                                           isStudent: provider.attendees[index]
+  //                                                   .userType ==
+  //                                               'Student',
+  //                                           company: provider.attendees[index]
+  //                                                       .userType ==
+  //                                                   'Student'
+  //                                               ? provider.attendees[index]
+  //                                                       .instituteName ??
+  //                                                   ''
+  //                                               : provider.attendees[index]
+  //                                                       .company ??
+  //                                                   '',
+  //                                           position: provider.attendees[index]
+  //                                                       .userType ==
+  //                                                   'Student'
+  //                                               ? provider.attendees[index]
+  //                                                       .degreeProgram ??
+  //                                                   ''
+  //                                               : provider.attendees[index]
+  //                                                       .position ??
+  //                                                   '',
+  //                                           interests: interestNames,
+  //                                           // Use the interest names instead of IDs
+  //                                           description: provider
+  //                                                   .attendees[index]
+  //                                                   .description ??
+  //                                               '',
+  //                                           onSkip: () {
+  //                                             provider.swipeAndConnectAction(
+  //                                                 receiverId: provider
+  //                                                     .attendees[index].id,
+  //                                                 action: false,
+  //                                                 conferenceId:
+  //                                                     widget.event.eventId);
+  //                                             context
+  //                                                 .showSnackBar('User Skipped');
+  //                                           },
+  //                                           onConnect: () {
+  //                                             provider.swipeAndConnectAction(
+  //                                                 receiverId: provider
+  //                                                     .attendees[index].id,
+  //                                                 action: true,
+  //                                                 conferenceId:
+  //                                                     widget.event.eventId);
+  //                                             if (provider.attendees[index]
+  //                                                 .isReceivedRequest) {
+  //                                               HelperFunction.showToast(
+  //                                                   'You both are connected now');
+  //                                             } else {
+  //                                               context.showSnackBar(
+  //                                                   'Request sent');
+  //                                             }
+  //                                           },
+  //                                           showSecondCard: showSecond,
+  //                                           isReceivedRequest: provider
+  //                                               .attendees[index]
+  //                                               .isReceivedRequest,
+  //                                         );
+  //                                       },
+  //                                     ),
+  //                                   ),
+  //                                 ],
+  //                               );
+  //                             },
+  //                           );
+  //                         },
+  //                       ),
+  //                     ),
+  //                   ),
+  //                 ],
+  //               );
+  //             }
+  //           },
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
+
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Scaffold(
-          body: Consumer<SwipeAndConnectProvider>(
-            builder: (context, provider, _) {
-              if (provider.isLoading || _isLoadingInterests) {
-                return Center(
-                  child: CircularProgressIndicator(),
-                );
-              } else if (provider.attendees.isEmpty) {
-                return const Center(
-                  child: Text('No more users available'),
-                );
-              } else {
-                return Column(
-                  children: [
-                    50.height,
-                    Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          child: Padding(
-                            padding: EdgeInsets.all(20.0.w),
-                            child: SvgPicture.asset(
-                              'assets/backward_arrow_head.svg',
-                              height: 25.h,
-                              width: 20.w,
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 250.w),
-                        GestureDetector(
-                          onTap: () async {
-                            final result =
-                                await context.pushNamed(PreferencesScreen.id);
-                            if (result != null && result is Map) {
-                              final designation = result['designation'];
-                              final interests = result['interests'];
-                              final provider =
-                                  Provider.of<SwipeAndConnectProvider>(context,
-                                      listen: false);
-                              provider.loadUsers(widget.event.eventId,
-                                  profession: designation, industry: interests);
-                            }
-                          },
-                          child: Padding(
-                            padding: EdgeInsets.all(10.w),
-                            child: SvgPicture.asset(
-                              IconConstants.filterIcon,
-                              height: 30.h,
-                              width: 20.w,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.all(24),
-                        child: PageView.builder(
-                          scrollDirection: Axis.horizontal,
-                          physics: NeverScrollableScrollPhysics(),
-                          onPageChanged: (index) {},
-                          allowImplicitScrolling: false,
-                          itemCount: provider.attendees.length,
-                          controller: _pageController,
-                          itemBuilder: (context, index) {
-                            final user = provider.attendees[index];
-                            final interestNames = getInterestNames(user);
-                            return ValueListenableBuilder<double>(
-                              valueListenable: offsetXNotifier,
-                              builder: (context, offsetX, child) {
-                                return Stack(
-                                  children: [
-                                    if ((index + 1) < provider.attendees.length)
-                                      BackgroundConnectWidget(
-                                        connect: provider.attendees[index + 1],
-                                        opacity: offsetX.clamp(0.0, 1.0),
-                                        color: _color.value,
-                                        showSecondCard: showSecondCard.value,
-                                        conferenceId: widget.event.eventId,
-                                      ),
-                                    SwipeWidget(
-                                      onChange: onDxChange,
-                                      onActionPerformed: (vl) {
-                                        if (vl > 200) {
-                                          provider.swipeAndConnectAction(
-                                              receiverId:
-                                                  provider.attendees[index].id,
-                                              action: true,
-                                              conferenceId:
-                                                  widget.event.eventId);
-                                          if (provider.attendees[index]
-                                              .isReceivedRequest) {
-                                            HelperFunction.showToast(
-                                                'You both are connected now');
-                                          } else {
-                                            context
-                                                .showSnackBar('Request sent');
-                                          }
-                                        } else if (vl < -200) {
-                                          provider.swipeAndConnectAction(
-                                              receiverId:
-                                                  provider.attendees[index].id,
-                                              action: false,
-                                              conferenceId:
-                                                  widget.event.eventId);
-                                          context.showSnackBar('User skipped');
-                                        }
-                                        showSecondCard.value = true;
-                                      },
-                                      child: ValueListenableBuilder<bool>(
-                                        valueListenable: showSecondCard,
-                                        builder: (context, showSecond, _) {
-                                          return AttendeeCard(
-                                            imageUrl: provider
-                                                .attendees[index].imageUrl,
-                                            name:
-                                                provider.attendees[index].name,
-                                            lastName: provider
-                                                .attendees[index].lastName,
-                                            isStudent: provider.attendees[index]
-                                                    .userType ==
-                                                'Student',
-                                            company: provider.attendees[index]
-                                                        .userType ==
-                                                    'Student'
-                                                ? provider.attendees[index]
-                                                        .instituteName ??
-                                                    ''
-                                                : provider.attendees[index]
-                                                        .company ??
-                                                    '',
-                                            position: provider.attendees[index]
-                                                        .userType ==
-                                                    'Student'
-                                                ? provider.attendees[index]
-                                                        .degreeProgram ??
-                                                    ''
-                                                : provider.attendees[index]
-                                                        .position ??
-                                                    '',
-                                            interests: interestNames,
-                                            // Use the interest names instead of IDs
-                                            description: provider
-                                                    .attendees[index]
-                                                    .description ??
-                                                '',
-                                            onSkip: () {
-                                              provider.swipeAndConnectAction(
-                                                  receiverId: provider
-                                                      .attendees[index].id,
-                                                  action: false,
-                                                  conferenceId:
-                                                      widget.event.eventId);
-                                              context
-                                                  .showSnackBar('User Skipped');
-                                            },
-                                            onConnect: () {
-                                              provider.swipeAndConnectAction(
-                                                  receiverId: provider
-                                                      .attendees[index].id,
-                                                  action: true,
-                                                  conferenceId:
-                                                      widget.event.eventId);
-                                              if (provider.attendees[index]
-                                                  .isReceivedRequest) {
-                                                HelperFunction.showToast(
-                                                    'You both are connected now');
-                                              } else {
-                                                context.showSnackBar(
-                                                    'Request sent');
-                                              }
-                                            },
-                                            showSecondCard: showSecond,
-                                            isReceivedRequest: provider
-                                                .attendees[index]
-                                                .isReceivedRequest,
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          },
-                        ),
+    return Scaffold(
+      body: Consumer<SwipeAndConnectProvider>(
+        builder: (context, provider, _) {
+          return Column(
+            children: [
+              50.height,
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.all(20.0.w),
+                      child: SvgPicture.asset(
+                        'assets/backward_arrow_head.svg',
+                        height: 25.h,
+                        width: 20.w,
                       ),
                     ),
-                  ],
-                );
-              }
-            },
-          ),
-        ),
-      ],
+                  ),
+                  SizedBox(width: 250.w),
+                  GestureDetector(
+                    onTap: () async {
+                      final result = await context.pushNamed(PreferencesScreen.id);
+                      if (result != null && result is Map) {
+                        final userType = result['userType'];
+                        final designation = result['profession'];
+                        final interests = result['industry'];
+
+                        final provider = Provider.of<SwipeAndConnectProvider>(context, listen: false);
+                        provider.loadUsers(
+                          widget.event.eventId,
+                          userType: userType,
+                          profession: designation,
+                          industry: interests,
+                        );
+                      }
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.all(10.w),
+                      child: SvgPicture.asset(
+                        IconConstants.filterIcon,
+                        height: 30.h,
+                        width: 20.w,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Expanded(
+                child: _isLoadingInterests || provider.isLoading
+                    ? Center(child: CircularProgressIndicator())
+                    : provider.attendees.isEmpty
+                    ? const Center(child: Text('No more users available'))
+                    : Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: PageView.builder(
+                    scrollDirection: Axis.horizontal,
+                    physics: NeverScrollableScrollPhysics(),
+                    onPageChanged: (index) {},
+                    allowImplicitScrolling: false,
+                    itemCount: provider.attendees.length,
+                    controller: _pageController,
+                    itemBuilder: (context, index) {
+                      final user = provider.attendees[index];
+                      final interestNames = getInterestNames(user);
+                      return ValueListenableBuilder<double>(
+                        valueListenable: offsetXNotifier,
+                        builder: (context, offsetX, child) {
+                          return Stack(
+                            children: [
+                              if ((index + 1) < provider.attendees.length)
+                                BackgroundConnectWidget(
+                                  connect: provider.attendees[index + 1],
+                                  opacity: offsetX.clamp(0.0, 1.0),
+                                  color: _color.value,
+                                  showSecondCard: showSecondCard.value,
+                                  conferenceId: widget.event.eventId,
+                                ),
+                              SwipeWidget(
+                                onChange: onDxChange,
+                                onActionPerformed: (vl) {
+                                  if (vl > 200) {
+                                    provider.swipeAndConnectAction(
+                                      receiverId: provider.attendees[index].id,
+                                      action: true,
+                                      conferenceId: widget.event.eventId,
+                                    );
+                                    if (provider.attendees[index].isReceivedRequest) {
+                                      HelperFunction.showToast('You both are connected now');
+                                    } else {
+                                      context.showSnackBar('Request sent');
+                                    }
+                                  } else if (vl < -200) {
+                                    provider.swipeAndConnectAction(
+                                      receiverId: provider.attendees[index].id,
+                                      action: false,
+                                      conferenceId: widget.event.eventId,
+                                    );
+                                    context.showSnackBar('User skipped');
+                                  }
+                                  showSecondCard.value = true;
+                                },
+                                child: ValueListenableBuilder<bool>(
+                                  valueListenable: showSecondCard,
+                                  builder: (context, showSecond, _) {
+                                    return AttendeeCard(
+                                      imageUrl: provider.attendees[index].imageUrl,
+                                      name: provider.attendees[index].name,
+                                      lastName: provider.attendees[index].lastName,
+                                      isStudent: provider.attendees[index].userType == 'Student',
+                                      company: provider.attendees[index].userType == 'Student'
+                                          ? provider.attendees[index].instituteName ?? ''
+                                          : provider.attendees[index].company ?? '',
+                                      position: provider.attendees[index].userType == 'Student'
+                                          ? provider.attendees[index].degreeProgram ?? ''
+                                          : provider.attendees[index].position ?? '',
+                                      interests: interestNames,
+                                      description: provider.attendees[index].description ?? '',
+                                      onSkip: () {
+                                        provider.swipeAndConnectAction(
+                                          receiverId: provider.attendees[index].id,
+                                          action: false,
+                                          conferenceId: widget.event.eventId,
+                                        );
+                                        context.showSnackBar('User Skipped');
+                                      },
+                                      onConnect: () {
+                                        provider.swipeAndConnectAction(
+                                          receiverId: provider.attendees[index].id,
+                                          action: true,
+                                          conferenceId: widget.event.eventId,
+                                        );
+                                        if (provider.attendees[index].isReceivedRequest) {
+                                          HelperFunction.showToast('You both are connected now');
+                                        } else {
+                                          context.showSnackBar('Request sent');
+                                        }
+                                      },
+                                      showSecondCard: showSecond,
+                                      isReceivedRequest: provider.attendees[index].isReceivedRequest,
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
+
 }

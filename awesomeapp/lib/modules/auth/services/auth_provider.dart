@@ -70,7 +70,7 @@ class AuthenticationProvider with ChangeNotifier {
       // Clear local user data regardless of backend result
       _appUser = null;
       _userCredential = null;
-      _hiveService.deleteUser();
+      await _hiveService.deleteUser();
 
       _setLoading(false);
       notifyListeners();
@@ -84,12 +84,7 @@ class AuthenticationProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> signUp(BuildContext context,
-      {required String email,
-      required String password,
-      required String firstName,
-      required String lastName,
-      required String confirmPassword}) async {
+  Future<bool> signUp(BuildContext context, {required String email, required String password, required String firstName, required String lastName, required String confirmPassword}) async {
     try {
       _setLoading(true);
       final AppUser? user = await _authNetworking.signUp(
@@ -118,8 +113,7 @@ class AuthenticationProvider with ChangeNotifier {
     }
   }
 
-  Future<void> createUserDocument(Map<String, dynamic> userData,
-      {bool isGoogleSignIn = false}) async {
+  Future<void> createUserDocument(Map<String, dynamic> userData, {bool isGoogleSignIn = false}) async {
     String userId;
     if (isGoogleSignIn) {
       userId = firebaseAuth.currentUser!.uid;
@@ -137,7 +131,7 @@ class AuthenticationProvider with ChangeNotifier {
     }
   }
 
-  Future<Map <String, dynamic>?> googleSignIn(BuildContext context) async {
+  Future<Map<String, dynamic>?> googleSignIn(BuildContext context) async {
     _setLoading(true);
     final user = await _socialNetworking.signInWithGoogle();
     _setLoading(false);
@@ -208,11 +202,10 @@ class AuthenticationProvider with ChangeNotifier {
   //   return null;
   // }
   Future<String?> authToken() async {
-    if (_appUser?.accessToken != null) {
-      return _appUser!.accessToken;
-    }
-
-    final user = await _hiveService.getUser(); // Always fetch fresh from Hive
+    // if (_appUser?.accessToken != null) {
+    //   return _appUser!.accessToken;
+    // }
+    final user = _hiveService.getUser(); // Always fetch fresh from Hive
     if (user != null) {
       _appUser = user; // Update in-memory user too
       return user.accessToken;

@@ -104,10 +104,11 @@ class ConnectionsNetworking {
     try {
       final url = ApiConstants.baseUrl + ApiConstants.getConnections;
       final dioInstance = DioClient.getDioInstance();
-      final appUser = HiveService().getUser();
+      final appUser = await HiveService().getUser();
       final currentUserId = appUser?.id ?? '';
       print("currentUserId: $currentUserId");
       final token = await serviceLocator<AuthenticationProvider>().authToken();
+      print("Token: $token");
 
 
       // Make the API call
@@ -148,6 +149,13 @@ class ConnectionsNetworking {
       // Loop through each connection
       for (var connection in connections) {
         if (connection is Map<String, dynamic>) {
+          final senderRaw = connection['sender'];
+          final receiverRaw = connection['receiver'];
+
+          if (senderRaw == null || receiverRaw == null) {
+            print("DEBUG: sender or receiver is null, skipping...");
+            continue;
+          }
           final Map<String, dynamic> senderDetails =
               connection['sender'] as Map<String, dynamic>;
           final Map<String, dynamic> receiverDetails = connection['receiver'];

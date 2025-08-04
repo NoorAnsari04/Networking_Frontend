@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:my_test_app_flavors/modules/events/swipe%20and%20connect/components/dropdown.dart';
+import 'package:provider/provider.dart';
 import '../../../../../core/shared/custom_elevated_button.dart';
 import '../../../../core/constants/icon_constants.dart';
 import '../../../../core/shared/custum_appbar.dart';
 import '../../../auth/components/user_type_selection.dart';
+import '../services/swipe_connect_provider.dart';
 
 class PreferencesScreen extends StatefulWidget {
   static const id = 'preferences';
@@ -13,42 +16,56 @@ class PreferencesScreen extends StatefulWidget {
 }
 
 class _PreferencesScreenState extends State<PreferencesScreen> {
-  String userType = 'Student';
-  String? selectedProfession;
-  String? selectedIndustry;
+  String? userType;
+
+  // String? selectedProfession;
+  DropdownOptions? selectedIndustry;
   TextEditingController reasonController = TextEditingController();
 
-  List<String> professions  = [
-    'Flutter Developer',
-    'ReactJs Developer',
-    'UX/UI Designer',
-    'Data Analyst',
-    'Mern Stack Developer',
-    'Mobile App Developer',
-    'Website Developer',
-    'SEO Specialist',
-    'Digital Marketer',
-    'Network Engineer',
-    'DevOps Engineer',
-    'Project Manager',
-    'Business Analyst',
-    'Data Scientist'
-  ];
+  // List<String> professions = [
+  //   'Flutter Developer',
+  //   'ReactJs Developer',
+  //   'UX/UI Designer',
+  //   'Data Analyst',
+  //   'Mern Stack Developer',
+  //   'Mobile App Developer',
+  //   'Website Developer',
+  //   'SEO Specialist',
+  //   'Digital Marketer',
+  //   'Network Engineer',
+  //   'DevOps Engineer',
+  //   'Project Manager',
+  //   'Business Analyst',
+  //   'Data Scientist'
+  // ];
 
-  List<String> industries  = [
-    'AI',
-    'Design',
-    'Devops',
-    'Cyber Security',
-    'Cloud Computing',
-    'Big Data',
-    'Software Development',
-    'Blockchain',
-    'Digital Marketing',
-    'Database Management',
-    'Business Intelligence',
-    'Network Infrastructure'
-  ];
+  List<DropdownOptions> industries = [];
+
+  @override
+  void initState() {
+    super.initState();
+    // getInterests();
+    Provider.of<SwipeAndConnectProvider>(context, listen: false)
+        .loadDropdownInterests();
+    // final provider = Provider.of<SwipeAndConnectProvider>(context, listen: false);
+    // provider.loadDropdownInterests();
+    // print('Loaded interests: ${provider.interests}');
+
+  }
+
+  Future<void> getInterests()async{
+    // TODO LOADER
+    // PROVIDER
+    final provider = Provider.of<SwipeAndConnectProvider>(context, listen: false);
+    await provider.loadDropdownInterests();
+    setState(() {
+      industries = provider.interests; // assuming you have a getter
+    });
+    print("Loaded ${industries.length} industries:");
+    for (var i in industries) {
+      print(" - ${i.name} (${i.id})");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +80,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
               // SizedBox(height: 20.h),
               CustomAppBar(
                 title: 'Advance Filters',
-                iconPath: IconConstants.backward_arrow,
+                iconPath: IconConstants.arrowIcon,
               ),
               SizedBox(height: 40.h),
               // UserTypeSelection(
@@ -87,6 +104,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
                     borderRadius: BorderRadius.circular(5)),
                 child: DropdownButton<String>(
                   value: userType,
+                  // hint: Text('Select user type'),
                   isExpanded: true,
                   underline: SizedBox(),
                   icon: Icon(Icons.arrow_drop_down),
@@ -103,64 +121,81 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
                   },
                 ),
               ),
-              SizedBox(height: 20.h),
-              if (userType == 'Industry Person') ...[
-                Text('Designation:', style: TextStyle(fontSize: 16.sp)),
-                Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  child: DropdownButton<String>(
-                    value: selectedProfession,
-                    isExpanded: true,
-                    items: professions.map((String profession) {
-                      return DropdownMenuItem<String>(
-                        value: profession,
-                        child: Text(profession),
-                      );
-                    }).toList(),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        selectedProfession = newValue;
-                      });
-                    },
-                  ),
-                ),
-                SizedBox(height: 20.h),
-              ],
+              // SizedBox(height: 20.h),
+              // if (userType == 'Industry Person') ...[
+              //   Text('Designation:', style: TextStyle(fontSize: 16.sp)),
+              //   Container(
+              //     decoration: BoxDecoration(
+              //       border: Border.all(color: Colors.grey),
+              //       borderRadius: BorderRadius.circular(5),
+              //     ),
+              //     child: DropdownButton<String>(
+              //       value: selectedProfession,
+              //       isExpanded: true,
+              //       items: professions.map((String profession) {
+              //         return DropdownMenuItem<String>(
+              //           value: profession,
+              //           child: Text(profession),
+              //         );
+              //       }).toList(),
+              //       onChanged: (String? newValue) {
+              //         setState(() {
+              //           selectedProfession = newValue;
+              //         });
+              //       },
+              //     ),
+              //   ),
+              //   SizedBox(height: 20.h),
+              // ],
               Text('Interests:', style: TextStyle(fontSize: 16.sp)),
-              Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                child: DropdownButton<String>(
-                  value: selectedIndustry,
-                  isExpanded: true,
-                  items: industries
-                      .map((String industry) {
-                    return DropdownMenuItem<String>(
-                      value: industry,
-                      child: Text(industry),
+              Consumer<SwipeAndConnectProvider>(
+                builder: (context, provider, _) {
+                  if (provider.isLoadingInterests) {
+                    return Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Center(child: CircularProgressIndicator()),
                     );
-                  }).toList(),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      selectedIndustry = newValue;
-                    });
-                  },
-                  underline: SizedBox(),
-                  icon: Icon(Icons.arrow_drop_down),
-                ),
+                  }
+
+                  if (provider.interests.isEmpty) {
+                    return Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text('No interests found'),
+                    );
+                  }
+                  return Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: DropdownButton<DropdownOptions>(
+                      value: selectedIndustry,
+                      isExpanded: true,
+                      items: provider.interests.map((industry) {
+                        return DropdownMenuItem<DropdownOptions>(
+                          value: industry,
+                          child: Text(industry.name),
+                        );
+                      }).toList(),
+                      onChanged: (DropdownOptions? newValue) {
+                        setState(() {
+                          selectedIndustry = newValue;
+                        });
+                      },
+                      underline: SizedBox(),
+                      icon: Icon(Icons.arrow_drop_down),
+                    ),
+                  );
+                },
               ),
               SizedBox(height: 20.h),
               Center(
                 child: CustomElevatedButton(
                   onPressed: () {
                     Navigator.pop(context, {
-                      'profession': selectedProfession,
-                      'industry': selectedIndustry,
+                      'userType': userType,
+                      // 'profession': selectedProfession,
+                      'industry': selectedIndustry?.id,
                     });
                   },
                   text: 'Done',
